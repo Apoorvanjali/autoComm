@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Automation - AutoComm</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-robot me-2"></i>AutoComm
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/summarizer">
+                            <i class="fas fa-file-alt me-1"></i>Summarizer
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/translator">
+                            <i class="fas fa-language me-1"></i>Translator
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/speech">
+                            <i class="fas fa-microphone me-1"></i>Speech
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/email">
+                            <i class="fas fa-envelope me-1"></i>Email
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <!-- Header -->
+                <div class="text-center mb-5">
+                    <i class="fas fa-envelope text-warning display-1 mb-3"></i>
+                    <h1 class="display-4 fw-bold mb-3">Email Automation</h1>
+                    <p class="lead text-muted">
+                        Generate professional emails and send them automatically with AI assistance
+                    </p>
+                </div>
+
+                <!-- Email Composition Form -->
+                <div class="card shadow-lg">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">
+                            <i class="fas fa-paper-plane me-2"></i>
+                            Compose & Send Email
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Email Template Generator -->
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <label for="emailTemplate" class="form-label fw-bold">
+                                    <i class="fas fa-magic me-1"></i>
+                                    Quick Email Templates
+                                </label>
+                                <select id="emailTemplate" class="form-select">
+                                    <option value="">Choose a template (optional)</option>
+                                    <option value="meeting_request">Meeting Request</option>
+                                    <option value="follow_up">Follow-up Email</option>
+                                    <option value="introduction">Introduction Email</option>
+                                    <option value="thank_you">Thank You Email</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold d-block">&nbsp;</label>
+                                <button type="button" id="generateTemplate" class="btn btn-outline-warning w-100">
+                                    <i class="fas fa-wand-magic-sparkles me-1"></i>
+                                    Generate Template
+                                </button>
+                            </div>
+                        </div>
+
+                        <form id="emailForm">
+                            <!-- Email Configuration -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label for="senderEmail" class="form-label fw-bold">
+                                        <i class="fas fa-user me-1"></i>
+                                        Your Email Address
+                                    </label>
+                                    <input type="email" id="senderEmail" class="form-control" 
+                                           placeholder="your.email@gmail.com" required>
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Use your Gmail, Yahoo, or Outlook email
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="senderPassword" class="form-label fw-bold">
+                                        <i class="fas fa-lock me-1"></i>
+                                        App Password
+                                    </label>
+                                    <input type="password" id="senderPassword" class="form-control" 
+                                           placeholder="Your app password" required>
+                                    <div class="form-text">
+                                        <i class="fas fa-shield-alt me-1"></i>
+                                        For Gmail: Use App Password, not regular password
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recipient and Subject -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label for="receiverEmail" class="form-label fw-bold">
+                                        <i class="fas fa-envelope me-1"></i>
+                                        Recipient Email
+                                    </label>
+                                    <input type="email" id="receiverEmail" class="form-control" 
+                                           placeholder="recipient@example.com" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="emailSubject" class="form-label fw-bold">
+                                        <i class="fas fa-tag me-1"></i>
+                                        Subject Line
+                                    </label>
+                                    <input type="text" id="emailSubject" class="form-control" 
+                                           placeholder="Email subject..." required>
+                                </div>
+                            </div>
+
+                            <!-- Email Message -->
+                            <div class="mb-4">
+                                <label for="emailMessage" class="form-label fw-bold">
+                                    <i class="fas fa-edit me-1"></i>
+                                    Email Message
+                                </label>
+                                <textarea id="emailMessage" class="form-control" rows="10" 
+                                          placeholder="Compose your professional email message here..." required></textarea>
+                                <div class="form-text">
+                                    Characters: <span id="messageCharCount">0</span>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-warning btn-lg" id="sendEmailBtn">
+                                            <i class="fas fa-paper-plane me-2"></i>
+                                            Send Email Now
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="d-flex flex-column gap-2">
+                                        <button type="button" id="previewEmail" class="btn btn-outline-info">
+                                            <i class="fas fa-eye me-1"></i>Preview
+                                        </button>
+                                        <button type="button" id="clearForm" class="btn btn-outline-secondary">
+                                            <i class="fas fa-trash me-1"></i>Clear
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div id="loadingSpinner" class="text-center my-4" style="display: none;">
+                    <div class="spinner-border text-warning" role="status">
+                        <span class="visually-hidden">Sending...</span>
+                    </div>
+                    <p class="mt-2 text-muted">
+                        <i class="fas fa-paper-plane me-1"></i>
+                        Sending your email...
+                    </p>
+                </div>
+
+                <!-- Success/Error Display -->
+                <div id="successSection" class="mt-4" style="display: none;">
+                    <div class="alert alert-success" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Email Sent Successfully!</strong> 
+                        <span id="successMessage">Your email has been delivered.</span>
+                    </div>
+                </div>
+
+                <div id="errorSection" class="mt-4" style="display: none;">
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Email Sending Failed:</strong> <span id="errorMessage"></span>
+                    </div>
+                </div>
+
+                <!-- Email Preview Modal -->
+                <div class="modal fade" id="emailPreviewModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header bg-warning text-dark">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-eye me-2"></i>
+                                    Email Preview
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="email-preview">
+                                    <div class="mb-3">
+                                        <strong>From:</strong> <span id="previewFrom"></span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>To:</strong> <span id="previewTo"></span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>Subject:</strong> <span id="previewSubject"></span>
+                                    </div>
+                                    <hr>
+                                    <div class="mb-3">
+                                        <strong>Message:</strong>
+                                        <div id="previewMessage" class="mt-2 p-3 bg-light rounded"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="fas fa-times me-1"></i>Close
+                                </button>
+                                <button type="button" class="btn btn-warning" id="sendFromPreview">
+                                    <i class="fas fa-paper-plane me-1"></i>Send Email
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gmail Setup Guide -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-question-circle me-2"></i>
+                            Gmail Setup Guide
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold text-primary mb-3">Step-by-Step Setup</h6>
+                                <ol class="list-group list-group-numbered">
+                                    <li class="list-group-item">Go to your Google Account settings</li>
+                                    <li class="list-group-item">Enable 2-Factor Authentication</li>
+                                    <li class="list-group-item">Navigate to "Security" → "App passwords"</li>
+                                    <li class="list-group-item">Generate a new app password</li>
+                                    <li class="list-group-item">Use this password in the form above</li>
+                                </ol>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="fw-bold text-warning mb-3">Important Notes</h6>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <i class="fas fa-shield-alt text-success me-2"></i>
+                                        Never use your actual Gmail password
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-key text-info me-2"></i>
+                                        App passwords are 16-character codes
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-clock text-warning me-2"></i>
+                                        App passwords don't expire automatically
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-trash text-danger me-2"></i>
+                                        Remove app passwords when not needed
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Templates Info -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-templates me-2"></i>
+                            Professional Email Templates
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="template-info">
+                                    <h6 class="fw-bold text-primary">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        Meeting Request
+                                    </h6>
+                                    <p class="text-muted small">Professional meeting scheduling with all necessary details</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="template-info">
+                                    <h6 class="fw-bold text-success">
+                                        <i class="fas fa-reply me-1"></i>
+                                        Follow-up
+                                    </h6>
+                                    <p class="text-muted small">Polite follow-up on previous conversations or requests</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="template-info">
+                                    <h6 class="fw-bold text-info">
+                                        <i class="fas fa-handshake me-1"></i>
+                                        Introduction
+                                    </h6>
+                                    <p class="text-muted small">Professional self-introduction for networking</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="template-info">
+                                    <h6 class="fw-bold text-warning">
+                                        <i class="fas fa-heart me-1"></i>
+                                        Thank You
+                                    </h6>
+                                    <p class="text-muted small">Express gratitude professionally and warmly</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    <!-- Email specific JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const emailForm = document.getElementById('emailForm');
+            const emailMessage = document.getElementById('emailMessage');
+            const messageCharCount = document.getElementById('messageCharCount');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const successSection = document.getElementById('successSection');
+            const errorSection = document.getElementById('errorSection');
+            const previewModal = new bootstrap.Modal(document.getElementById('emailPreviewModal'));
+            
+            // Character counter
+            emailMessage.addEventListener('input', function() {
+                messageCharCount.textContent = this.value.length;
+            });
+            
+            // Template generator
+            document.getElementById('generateTemplate').addEventListener('click', function() {
+                const templateType = document.getElementById('emailTemplate').value;
+                if (!templateType) {
+                    alert('Please select a template first.');
+                    return;
+                }
+                
+                generateEmailTemplate(templateType);
+            });
+            
+            // Preview email
+            document.getElementById('previewEmail').addEventListener('click', function() {
+                showEmailPreview();
+            });
+            
+            // Clear form
+            document.getElementById('clearForm').addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all fields?')) {
+                    emailForm.reset();
+                    messageCharCount.textContent = '0';
+                    hideMessages();
+                }
+            });
+            
+            // Send from preview
+            document.getElementById('sendFromPreview').addEventListener('click', function() {
+                previewModal.hide();
+                emailForm.dispatchEvent(new Event('submit'));
+            });
+            
+            // Form submission
+            emailForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = {
+                    sender_email: document.getElementById('senderEmail').value.trim(),
+                    sender_password: document.getElementById('senderPassword').value.trim(),
+                    receiver_email: document.getElementById('receiverEmail').value.trim(),
+                    subject: document.getElementById('emailSubject').value.trim(),
+                    message: emailMessage.value.trim()
+                };
+                
+                // Validate form
+                if (!validateForm(formData)) {
+                    return;
+                }
+                
+                showLoading();
+                hideMessages();
+                
+                try {
+                    const response = await fetch('/api/send-email', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        showSuccess(data.message);
+                    } else {
+                        showError(data.error || 'Email sending failed');
+                    }
+                } catch (error) {
+                    showError('Network error. Please try again.');
+                }
+                
+                hideLoading();
+            });
+            
+            function validateForm(formData) {
+                if (!formData.sender_email || !formData.sender_password || 
+                    !formData.receiver_email || !formData.subject || !formData.message) {
+                    showError('All fields are required.');
+                    return false;
+                }
+                
+                // Basic email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(formData.sender_email)) {
+                    showError('Please enter a valid sender email address.');
+                    return false;
+                }
+                
+                if (!emailRegex.test(formData.receiver_email)) {
+                    showError('Please enter a valid recipient email address.');
+                    return false;
+                }
+                
+                return true;
+            }
+            
+            function generateEmailTemplate(type) {
+                const templates = {
+                    meeting_request: {
+                        subject: 'Meeting Request: Discussion',
+                        message: `Dear [Recipient Name],
+
+I hope this email finds you well. I would like to schedule a meeting to discuss [Topic].
+
+Proposed Details:
+- Date: [Date]
+- Time: [Time]
+- Duration: 1 hour
+- Location/Platform: [Location]
+
+Please let me know if this works for your schedule, or suggest alternative times that would be more convenient.
+
+Thank you for your time and consideration.
+
+Best regards,
+[Your Name]`
+                    },
+                    follow_up: {
+                        subject: 'Follow-up: Our Previous Discussion',
+                        message: `Dear [Recipient Name],
+
+I hope you are doing well. I wanted to follow up on our previous discussion regarding [Topic].
+
+[Follow-up message - add specific details about what you're following up on]
+
+Please let me know if you need any additional information from my side.
+
+Looking forward to your response.
+
+Best regards,
+[Your Name]`
+                    },
+                    introduction: {
+                        subject: 'Introduction: [Your Name]',
+                        message: `Dear [Recipient Name],
+
+I hope this email finds you well. My name is [Your Name], and I am [Your Title/Position].
+
+[Introduction message - explain why you're reaching out and what you'd like to discuss]
+
+I would be happy to schedule a brief call or meeting at your convenience to discuss this further.
+
+Thank you for your time, and I look forward to hearing from you.
+
+Best regards,
+[Your Name]
+[Your Contact Information]`
+                    },
+                    thank_you: {
+                        subject: 'Thank You - [Topic]',
+                        message: `Dear [Recipient Name],
+
+I wanted to take a moment to express my sincere gratitude for [Reason for thanks].
+
+[Thank you message - be specific about what you're thankful for]
+
+Please don't hesitate to reach out if there's anything I can do to return the favor.
+
+Thank you once again.
+
+Warm regards,
+[Your Name]`
+                    }
+                };
+                
+                const template = templates[type];
+                if (template) {
+                    document.getElementById('emailSubject').value = template.subject;
+                    emailMessage.value = template.message;
+                    messageCharCount.textContent = template.message.length;
+                }
+            }
+            
+            function showEmailPreview() {
+                document.getElementById('previewFrom').textContent = document.getElementById('senderEmail').value || '[Not specified]';
+                document.getElementById('previewTo').textContent = document.getElementById('receiverEmail').value || '[Not specified]';
+                document.getElementById('previewSubject').textContent = document.getElementById('emailSubject').value || '[No subject]';
+                document.getElementById('previewMessage').textContent = emailMessage.value || '[No message]';
+                
+                previewModal.show();
+            }
+            
+            function showLoading() {
+                loadingSpinner.style.display = 'block';
+            }
+            
+            function hideLoading() {
+                loadingSpinner.style.display = 'none';
+            }
+            
+            function showSuccess(message) {
+                document.getElementById('successMessage').textContent = message;
+                successSection.style.display = 'block';
+                
+                // Scroll to success message
+                successSection.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            function showError(message) {
+                document.getElementById('errorMessage').textContent = message;
+                errorSection.style.display = 'block';
+                
+                // Scroll to error message
+                errorSection.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            function hideMessages() {
+                successSection.style.display = 'none';
+                errorSection.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
