@@ -11,6 +11,14 @@ except ImportError:
     print("⚠️ Transformers not available, using fallback summarization")
 
 import logging
+import re
+
+# Length configuration mapping
+LENGTH_CONFIGS = {
+    'short': {'min_length': 60, 'max_length': 160},    # ~30-80 words
+    'medium': {'min_length': 160, 'max_length': 300},  # ~80-150 words
+    'long': {'min_length': 300, 'max_length': 500}     # ~150-250 words
+}
 
 class TextSummarizer:
     def __init__(self):
@@ -40,21 +48,27 @@ class TextSummarizer:
         else:
             print("✅ Text Summarizer initialized with extraction-based method")
 
-    def summarize(self, text, max_length=150, min_length=30):
+    def summarize(self, text, length='medium', style='paragraph'):
         """
         Summarize the given text using AI
         
         Args:
             text (str): Input text to summarize
-            max_length (int): Maximum length of summary
-            min_length (int): Minimum length of summary
+            length (str): Summary length - 'short', 'medium', or 'long'
+            style (str): Summary style - 'paragraph', 'bullet', or 'abstract'
             
         Returns:
             str: Summarized text
         """
         try:
             if not self.summarizer:
-                return self._fallback_summarize(text)
+                summary = self._fallback_summarize(text)
+                return self._format_summary(summary, style)
+            
+            # Get length configuration
+            length_config = LENGTH_CONFIGS.get(length, LENGTH_CONFIGS['medium'])
+            max_length = length_config['max_length']
+            min_length = length_config['min_length']
             
             # Clean and prepare text
             text = text.strip()
@@ -88,9 +102,9 @@ class TextSummarizer:
                         min_length=min_length,
                         do_sample=False
                     )
-                    return final_result[0]['summary_text']
+                    summary = final_result[0]['summary_text']
                 else:
-                    return combined_summary
+                    summary = combined_summary
             else:
                 # Summarize directly for shorter texts
                 result = self.summarizer(
@@ -99,11 +113,56 @@ class TextSummarizer:
                     min_length=min(min_length, len(text.split())//4),
                     do_sample=False
                 )
-                return result[0]['summary_text']
+                summary = result[0]['summary_text']
+            
+            # Apply style formatting
+            return self._format_summary(summary, style)
                 
         except Exception as e:
             print(f"❌ Summarization error: {e}")
             return self._fallback_summarize(text)
+
+    def _format_summary(self, summary, style):
+        """
+        Format the summary according to the specified style
+        
+        Args:
+            summary (str): The raw summary text
+            style (str): The desired style - 'paragraph', 'bullet', or 'abstract'
+            
+        Returns:
+            str: Formatted summary
+        """
+        if style == 'paragraph':
+            # Default style, return as-is
+            return summary
+        
+        elif style == 'bullet':
+            # Convert to bullet points
+            sentences = re.split(r'(?<=[.!?])\s+', summary.strip())
+            bullets = [f"• {sentence.strip()}" for sentence in sentences if sentence.strip()]
+            return '\n'.join(bullets)
+        
+        elif style == 'abstract':
+            # Format as abstract with key points
+            sentences = re.split(r'(?<=[.!?])\s+', summary.strip())
+            if len(sentences) == 0:
+                return summary
+            
+            # First sentence as main abstract
+            abstract_text = f"**Abstract**\n\n{sentences[0].strip()}"
+            
+            # Remaining sentences as key points
+            if len(sentences) > 1:
+                key_points = [f"• {sentence.strip()}" for sentence in sentences[1:] if sentence.strip()]
+                if key_points:
+                    abstract_text += f"\n\n**Key Points:**\n" + '\n'.join(key_points)
+            
+            return abstract_text
+        
+        else:
+            # Unknown style, return as paragraph
+            return summary
 
     def _split_text(self, text, chunk_size):
         """

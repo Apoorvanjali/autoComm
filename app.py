@@ -76,6 +76,8 @@ def api_summarize():
     try:
         data = request.get_json()
         text = data.get('text', '').strip()
+        summary_length = data.get('summary_length', 'medium')
+        summary_style = data.get('summary_style', 'paragraph')
         
         if not text:
             return jsonify({'error': 'Text is required'}), 400
@@ -83,8 +85,8 @@ def api_summarize():
         if len(text) < 100:
             return jsonify({'error': 'Text must be at least 100 characters long for meaningful summarization'}), 400
         
-        # Generate summary using AI service
-        summary = summarizer.summarize(text)
+        # Generate summary using AI service with length and style options
+        summary = summarizer.summarize(text, length=summary_length, style=summary_style)
         
         return jsonify({
             'success': True,
