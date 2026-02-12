@@ -1,288 +1,127 @@
-/**
- * AutoComm - Main JavaScript File
- * Handles common functionality across all pages
- */
+/* ============================================
+   AutoComm - Main JavaScript
+   Theme Switching & Enhanced Interactions
+   ============================================ */
 
-// Global variables
-let currentTheme = 'light';
-let notifications = [];
+// Theme Management
+const ThemeManager = {
+    init() {
+        this.createThemeToggle();
+        this.loadTheme();
+        this.setupEventListeners();
+    },
 
-// Initialize application when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    initializeApp();
-});
+    createThemeToggle() {
+        // Check if toggle already exists
+        if (document.querySelector('.theme-toggle')) return;
 
-/**
- * Initialize the application
- */
-function initializeApp() {
-    console.log('🚀 AutoComm Application Initializing...');
-    
-    // Initialize Bootstrap tooltips
-    initializeTooltips();
-    
-    // Initialize theme system
-    initializeTheme();
-    
-    // Initialize navigation
-    initializeNavigation();
-    
-    // Initialize common form handlers
-    initializeCommonFormHandlers();
-    
-    // Initialize animations
-    initializeAnimations();
-    
-    // Initialize error handling
-    initializeGlobalErrorHandling();
-    
-    console.log('✅ AutoComm Application Initialized Successfully');
-}
+        const toggle = document.createElement('button');
+        toggle.className = 'theme-toggle';
+        toggle.setAttribute('aria-label', 'Toggle theme');
+        toggle.innerHTML = '<i class="fas fa-moon"></i>';
+        document.body.appendChild(toggle);
+    },
 
-/**
- * Initialize Bootstrap tooltips
- */
-function initializeTooltips() {
-    try {
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-        console.log('✅ Tooltips initialized');
-    } catch (error) {
-        console.warn('⚠️ Tooltips initialization failed:', error);
-    }
-}
+    loadTheme() {
+        const savedTheme = localStorage.getItem('autocomm-theme') || 'light';
+        this.setTheme(savedTheme, false);
+    },
 
-/**
- * Initialize theme system
- */
-function initializeTheme() {
-    // Get saved theme from localStorage
-    const savedTheme = localStorage.getItem('autocomm-theme');
-    if (savedTheme) {
-        currentTheme = savedTheme;
-        applyTheme(currentTheme);
-    }
-    
-    // Add theme toggle listener if button exists
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) {
-        themeToggle.addEventListener('click', toggleTheme);
-    }
-}
+    setTheme(theme, save = true) {
+        const html = document.documentElement;
+        const toggle = document.querySelector('.theme-toggle i');
 
-/**
- * Toggle between light and dark themes
- */
-function toggleTheme() {
-    currentTheme = currentTheme === 'light' ? 'dark' : 'light';
-    applyTheme(currentTheme);
-    localStorage.setItem('autocomm-theme', currentTheme);
-}
-
-/**
- * Apply theme to the document
- */
-function applyTheme(theme) {
-    document.body.setAttribute('data-theme', theme);
-    
-    // Update theme toggle button icon
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) {
-        const icon = themeToggle.querySelector('i');
-        if (icon) {
-            icon.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
-        }
-    }
-}
-
-/**
- * Initialize navigation features
- */
-function initializeNavigation() {
-    // Highlight active navigation item
-    const currentPath = window.location.pathname;
-    const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
-    
-    navLinks.forEach(link => {
-        if (link.getAttribute('href') === currentPath) {
-            link.classList.add('active');
+        if (theme === 'dark') {
+            html.setAttribute('data-theme', 'dark');
+            if (toggle) toggle.className = 'fas fa-sun';
         } else {
-            link.classList.remove('active');
+            html.removeAttribute('data-theme');
+            if (toggle) toggle.className = 'fas fa-moon';
         }
-    });
-    
-    // Mobile navigation auto-close
-    const navbarToggler = document.querySelector('.navbar-toggler');
-    const navbarCollapse = document.querySelector('.navbar-collapse');
-    
-    if (navbarToggler && navbarCollapse) {
-        document.addEventListener('click', function(e) {
-            if (!navbarToggler.contains(e.target) && !navbarCollapse.contains(e.target)) {
-                if (navbarCollapse.classList.contains('show')) {
-                    navbarToggler.click();
-                }
+
+        if (save) {
+            localStorage.setItem('autocomm-theme', theme);
+        }
+    },
+
+    toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        this.setTheme(newTheme);
+    },
+
+    setupEventListeners() {
+        const toggle = document.querySelector('.theme-toggle');
+        if (toggle) {
+            toggle.addEventListener('click', () => this.toggleTheme());
+        }
+    }
+};
+
+// Initialize theme on page load
+document.addEventListener('DOMContentLoaded', () => {
+    ThemeManager.init();
+
+    // Add fade-in animation to main content
+    const mainContent = document.querySelector('.container');
+    if (mainContent) {
+        mainContent.classList.add('fade-in');
+    }
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
             }
         });
-    }
-}
-
-/**
- * Initialize common form handlers
- */
-function initializeCommonFormHandlers() {
-    // Auto-resize textareas
-    const textareas = document.querySelectorAll('textarea[data-auto-resize]');
-    textareas.forEach(textarea => {
-        textarea.addEventListener('input', autoResizeTextarea);
     });
-    
-    // Form validation helpers
-    const forms = document.querySelectorAll('form[data-validate]');
-    forms.forEach(form => {
-        form.addEventListener('submit', handleFormValidation);
+
+    // Add ripple effect to buttons
+    document.querySelectorAll('.btn').forEach(button => {
+        button.addEventListener('click', function (e) {
+            // Remove any existing ripples first
+            const existingRipples = this.querySelectorAll('.ripple');
+            existingRipples.forEach(r => r.remove());
+
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.style.position = 'absolute';
+            ripple.style.borderRadius = '50%';
+            ripple.style.background = 'rgba(255, 255, 255, 0.5)';
+            ripple.style.transform = 'scale(0)';
+            ripple.style.animation = 'ripple-animation 0.6s ease-out';
+            ripple.style.pointerEvents = 'none';
+            ripple.classList.add('ripple');
+
+            this.appendChild(ripple);
+
+            setTimeout(() => {
+                if (ripple.parentNode) {
+                    ripple.remove();
+                }
+            }, 600);
+        });
     });
-    
-    // File upload handlers
-    const fileInputs = document.querySelectorAll('input[type="file"]');
-    fileInputs.forEach(input => {
-        input.addEventListener('change', handleFileUpload);
-    });
-}
 
-/**
- * Auto-resize textarea based on content
- */
-function autoResizeTextarea(e) {
-    const textarea = e.target;
-    textarea.style.height = 'auto';
-    textarea.style.height = textarea.scrollHeight + 'px';
-}
-
-/**
- * Handle form validation
- */
-function handleFormValidation(e) {
-    const form = e.target;
-    const requiredFields = form.querySelectorAll('[required]');
-    let isValid = true;
-    
-    requiredFields.forEach(field => {
-        if (!field.value.trim()) {
-            showFieldError(field, 'This field is required');
-            isValid = false;
-        } else {
-            clearFieldError(field);
-        }
-    });
-    
-    if (!isValid) {
-        e.preventDefault();
-        showNotification('Please fill in all required fields', 'error');
-    }
-}
-
-/**
- * Show error message for a field
- */
-function showFieldError(field, message) {
-    field.classList.add('is-invalid');
-    
-    let errorDiv = field.parentNode.querySelector('.invalid-feedback');
-    if (!errorDiv) {
-        errorDiv = document.createElement('div');
-        errorDiv.className = 'invalid-feedback';
-        field.parentNode.appendChild(errorDiv);
-    }
-    
-    errorDiv.textContent = message;
-}
-
-/**
- * Clear error message for a field
- */
-function clearFieldError(field) {
-    field.classList.remove('is-invalid');
-    
-    const errorDiv = field.parentNode.querySelector('.invalid-feedback');
-    if (errorDiv) {
-        errorDiv.remove();
-    }
-}
-
-/**
- * Handle file upload preview and validation
- */
-function handleFileUpload(e) {
-    const input = e.target;
-    const file = input.files[0];
-    
-    if (!file) return;
-    
-    // Validate file size (default 10MB)
-    const maxSize = input.dataset.maxSize ? parseInt(input.dataset.maxSize) : 10 * 1024 * 1024;
-    if (file.size > maxSize) {
-        showNotification(`File size must be less than ${formatFileSize(maxSize)}`, 'error');
-        input.value = '';
-        return;
-    }
-    
-    // Validate file type if specified
-    const allowedTypes = input.dataset.allowedTypes;
-    if (allowedTypes) {
-        const allowed = allowedTypes.split(',').map(type => type.trim());
-        if (!allowed.some(type => file.type.includes(type))) {
-            showNotification(`File type not allowed. Allowed types: ${allowedTypes}`, 'error');
-            input.value = '';
-            return;
-        }
-    }
-    
-    // Show file info
-    showFileInfo(input, file);
-}
-
-/**
- * Show file information
- */
-function showFileInfo(input, file) {
-    let infoDiv = input.parentNode.querySelector('.file-info');
-    if (!infoDiv) {
-        infoDiv = document.createElement('div');
-        infoDiv.className = 'file-info text-muted small mt-2';
-        input.parentNode.appendChild(infoDiv);
-    }
-    
-    infoDiv.innerHTML = `
-        <i class="fas fa-file me-1"></i>
-        <strong>${file.name}</strong> (${formatFileSize(file.size)})
-    `;
-}
-
-/**
- * Format file size in human readable format
- */
-function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-
-/**
- * Initialize animations
- */
-function initializeAnimations() {
-    // Intersection Observer for fade-in animations
+    // Animate elements on scroll
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
     };
-    
+
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -291,360 +130,138 @@ function initializeAnimations() {
             }
         });
     }, observerOptions);
-    
-    // Observe elements with animation classes
-    const animatedElements = document.querySelectorAll('.animate-on-scroll, .feature-card, .stat-item');
-    animatedElements.forEach(el => observer.observe(el));
-    
-    // Smooth scroll for anchor links
-    const anchorLinks = document.querySelectorAll('a[href^="#"]');
-    anchorLinks.forEach(link => {
-        link.addEventListener('click', handleSmoothScroll);
-    });
-}
 
-/**
- * Handle smooth scrolling for anchor links
- */
-function handleSmoothScroll(e) {
-    e.preventDefault();
-    
-    const targetId = e.target.getAttribute('href');
-    const targetElement = document.querySelector(targetId);
-    
-    if (targetElement) {
-        targetElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
+    // Observe cards and feature elements
+    document.querySelectorAll('.card, .feature-card, .stat-item').forEach(el => {
+        observer.observe(el);
+    });
+});
+
+// Utility Functions
+const Utils = {
+    // Copy text to clipboard
+    copyToClipboard(text) {
+        return navigator.clipboard.writeText(text).then(() => {
+            return true;
+        }).catch(() => {
+            // Fallback for older browsers
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            const success = document.execCommand('copy');
+            document.body.removeChild(textarea);
+            return success;
         });
-    }
-}
+    },
 
-/**
- * Initialize global error handling
- */
-function initializeGlobalErrorHandling() {
-    // Handle uncaught errors
-    window.addEventListener('error', function(e) {
-        console.error('Global error caught:', e.error);
-        showNotification('An unexpected error occurred. Please try again.', 'error');
-    });
-    
-    // Handle unhandled promise rejections
-    window.addEventListener('unhandledrejection', function(e) {
-        console.error('Unhandled promise rejection:', e.reason);
-        showNotification('An error occurred while processing your request.', 'error');
-    });
-}
+    // Show toast notification
+    showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast-notification toast-${type}`;
+        toast.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            <span>${message}</span>
+        `;
 
-/**
- * Show notification to user
- */
-function showNotification(message, type = 'info', duration = 5000) {
-    const notification = {
-        id: Date.now(),
-        message: message,
-        type: type,
-        duration: duration
-    };
-    
-    notifications.push(notification);
-    renderNotification(notification);
-    
-    // Auto-remove notification
-    setTimeout(() => {
-        removeNotification(notification.id);
-    }, duration);
-}
+        document.body.appendChild(toast);
 
-/**
- * Render notification element
- */
-function renderNotification(notification) {
-    // Create notification container if it doesn't exist
-    let container = document.getElementById('notification-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'notification-container';
-        container.className = 'position-fixed top-0 end-0 p-3';
-        container.style.zIndex = '9999';
-        document.body.appendChild(container);
-    }
-    
-    // Create notification element
-    const notificationEl = document.createElement('div');
-    notificationEl.className = `alert alert-${getBootstrapAlertClass(notification.type)} alert-dismissible fade show`;
-    notificationEl.setAttribute('data-notification-id', notification.id);
-    
-    const iconClass = getNotificationIcon(notification.type);
-    
-    notificationEl.innerHTML = `
-        <i class="fas ${iconClass} me-2"></i>
-        ${notification.message}
-        <button type="button" class="btn-close" onclick="removeNotification(${notification.id})"></button>
-    `;
-    
-    container.appendChild(notificationEl);
-    
-    // Animate in
-    setTimeout(() => {
-        notificationEl.classList.add('slide-up');
-    }, 10);
-}
-
-/**
- * Remove notification
- */
-function removeNotification(id) {
-    const notificationEl = document.querySelector(`[data-notification-id="${id}"]`);
-    if (notificationEl) {
-        notificationEl.style.opacity = '0';
-        notificationEl.style.transform = 'translateX(100%)';
-        
         setTimeout(() => {
-            if (notificationEl.parentNode) {
-                notificationEl.parentNode.removeChild(notificationEl);
-            }
-        }, 300);
+            toast.classList.add('show');
+        }, 100);
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    },
+
+    // Download text as file
+    downloadTextFile(text, filename) {
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    },
+
+    // Format file size
+    formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
     }
-    
-    notifications = notifications.filter(n => n.id !== id);
-}
-
-/**
- * Get Bootstrap alert class for notification type
- */
-function getBootstrapAlertClass(type) {
-    const classMap = {
-        'success': 'success',
-        'error': 'danger',
-        'warning': 'warning',
-        'info': 'info'
-    };
-    
-    return classMap[type] || 'info';
-}
-
-/**
- * Get icon for notification type
- */
-function getNotificationIcon(type) {
-    const iconMap = {
-        'success': 'fa-check-circle',
-        'error': 'fa-exclamation-triangle',
-        'warning': 'fa-exclamation-circle',
-        'info': 'fa-info-circle'
-    };
-    
-    return iconMap[type] || 'fa-info-circle';
-}
-
-/**
- * Utility function to format text
- */
-function formatText(text, options = {}) {
-    if (!text) return '';
-    
-    let formatted = text.toString();
-    
-    // Trim whitespace
-    if (options.trim !== false) {
-        formatted = formatted.trim();
-    }
-    
-    // Convert to title case
-    if (options.titleCase) {
-        formatted = formatted.replace(/\w\S*/g, (txt) => 
-            txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
-        );
-    }
-    
-    // Truncate text
-    if (options.maxLength && formatted.length > options.maxLength) {
-        formatted = formatted.substring(0, options.maxLength) + '...';
-    }
-    
-    return formatted;
-}
-
-/**
- * Utility function to debounce function calls
- */
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-/**
- * Utility function to copy text to clipboard
- */
-async function copyToClipboard(text) {
-    try {
-        await navigator.clipboard.writeText(text);
-        showNotification('Copied to clipboard!', 'success', 2000);
-        return true;
-    } catch (err) {
-        console.error('Failed to copy text:', err);
-        showNotification('Failed to copy to clipboard', 'error');
-        return false;
-    }
-}
-
-/**
- * Utility function to download text as file
- */
-function downloadTextAsFile(text, filename = 'download.txt', mimeType = 'text/plain') {
-    const blob = new Blob([text], { type: mimeType });
-    const url = window.URL.createObjectURL(blob);
-    
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-}
-
-/**
- * Utility function to validate email address
- */
-function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
-
-/**
- * Utility function to validate URL
- */
-function isValidURL(string) {
-    try {
-        new URL(string);
-        return true;
-    } catch (_) {
-        return false;
-    }
-}
-
-/**
- * Utility function to format date
- */
-function formatDate(date, options = {}) {
-    const defaultOptions = {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        ...options
-    };
-    
-    return new Date(date).toLocaleDateString('en-US', defaultOptions);
-}
-
-/**
- * Utility function to format time
- */
-function formatTime(date, options = {}) {
-    const defaultOptions = {
-        hour: '2-digit',
-        minute: '2-digit',
-        ...options
-    };
-    
-    return new Date(date).toLocaleTimeString('en-US', defaultOptions);
-}
-
-/**
- * Utility function to check if element is in viewport
- */
-function isInViewport(element) {
-    const rect = element.getBoundingClientRect();
-    return (
-        rect.top >= 0 &&
-        rect.left >= 0 &&
-        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-    );
-}
-
-/**
- * Utility function to create loading state
- */
-function showLoadingState(element, loadingText = 'Loading...') {
-    if (!element) return;
-    
-    element.dataset.originalContent = element.innerHTML;
-    element.innerHTML = `
-        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-        ${loadingText}
-    `;
-    element.disabled = true;
-}
-
-/**
- * Utility function to hide loading state
- */
-function hideLoadingState(element) {
-    if (!element || !element.dataset.originalContent) return;
-    
-    element.innerHTML = element.dataset.originalContent;
-    element.disabled = false;
-    delete element.dataset.originalContent;
-}
-
-/**
- * API Helper function for making HTTP requests
- */
-async function apiRequest(url, options = {}) {
-    const defaultOptions = {
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        ...options
-    };
-    
-    try {
-        const response = await fetch(url, defaultOptions);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-            return await response.json();
-        } else {
-            return await response.blob();
-        }
-    } catch (error) {
-        console.error('API request failed:', error);
-        throw error;
-    }
-}
-
-// Export functions for global access
-window.AutoComm = {
-    showNotification,
-    removeNotification,
-    formatText,
-    debounce,
-    copyToClipboard,
-    downloadTextAsFile,
-    isValidEmail,
-    isValidURL,
-    formatDate,
-    formatTime,
-    isInViewport,
-    showLoadingState,
-    hideLoadingState,
-    apiRequest
 };
 
-console.log('📦 AutoComm JavaScript Library Loaded');
+// Export for use in other scripts
+window.ThemeManager = ThemeManager;
+window.Utils = Utils;
+
+// Add CSS for toast notifications
+const toastStyles = document.createElement('style');
+toastStyles.textContent = `
+    .toast-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--bg-card);
+        color: var(--text-primary);
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        z-index: 9999;
+        transform: translateX(400px);
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-left: 4px solid;
+    }
+    
+    .toast-notification.show {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    
+    .toast-notification.toast-success {
+        border-left-color: var(--success);
+    }
+    
+    .toast-notification.toast-success i {
+        color: var(--success);
+    }
+    
+    .toast-notification.toast-error {
+        border-left-color: var(--danger);
+    }
+    
+    .toast-notification.toast-error i {
+        color: var(--danger);
+    }
+    
+    .toast-notification i {
+        font-size: 1.25rem;
+    }
+    
+    @media (max-width: 768px) {
+        .toast-notification {
+            right: 10px;
+            left: 10px;
+            transform: translateY(-100px);
+        }
+        
+        .toast-notification.show {
+            transform: translateY(0);
+        }
+    }
+`;
+document.head.appendChild(toastStyles);

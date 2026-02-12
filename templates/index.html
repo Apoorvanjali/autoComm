@@ -1,22 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoComm - AI-Powered Communication Suite</title>
+    <title>AutoComm - Enterprise AI Communication Platform</title>
+    <meta name="description"
+        content="Transform your content workflow with enterprise-grade AI. Professional text processing, translation, and automation tools powered by advanced machine learning.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome for Icons -->
+
+    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
+
+    <!-- Custom Premium CSS -->
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
 </head>
+
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <!-- Premium Navigation -->
+    <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <i class="fas fa-robot me-2"></i>AutoComm
+                <i class="fas fa-bolt"></i>AutoComm
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -24,143 +37,251 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="/">
-                            <i class="fas fa-home me-1"></i>Home
-                        </a>
+                        <a class="nav-link active" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/summarizer">
-                            <i class="fas fa-file-alt me-1"></i>Summarizer
-                        </a>
+                        <a class="nav-link" href="/summarizer">Summarizer</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/translator">
-                            <i class="fas fa-language me-1"></i>Translator
-                        </a>
+                        <a class="nav-link" href="/translator">Translator</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/speech">
-                            <i class="fas fa-microphone me-1"></i>Speech
-                        </a>
+                        <a class="nav-link" href="/speech">Speech</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/email">
-                            <i class="fas fa-envelope me-1"></i>Email
-                        </a>
+                        <a class="nav-link" href="/email">Email</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero-section bg-gradient text-white py-5">
+    <!-- Premium Hero Section -->
+    <section class="hero-section">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <h1 class="display-4 fw-bold mb-4">
-                        <i class="fas fa-magic text-warning me-2"></i>
-                        AutoComm
+                <div class="col-lg-7 mb-5 mb-lg-0">
+                    <div class="hero-badge fade-in">
+                        <i class="fas fa-sparkles"></i>
+                        <span>Powered by State-of-the-Art AI Models</span>
+                    </div>
+
+                    <h1 class="display-2 fw-bold mb-4 fade-in-up">
+                        Supercharge Your Content
+                        <span class="text-gradient d-block">With Intelligent AI Tools</span>
                     </h1>
-                    <p class="lead mb-4">
-                        AI-Powered Communication and Content Automation Suite
+
+                    <p class="lead mb-4"
+                        style="color: var(--text-secondary); font-size: 1.375rem; max-width: 620px; line-height: 1.6;">
+                        Professional AI-powered platform for intelligent text summarization, multilingual translation,
+                        speech processing, and automated email generation.
+                        <strong style="color: var(--text-primary);">Save hours of work</strong> while delivering
+                        exceptional results.
                     </p>
-                    <p class="mb-4">
-                        Streamline your communication workflow with cutting-edge AI technology. 
-                        From text summarization to speech processing and automated email generation.
-                    </p>
-                    <div class="d-flex flex-wrap gap-2">
-                        <span class="badge bg-light text-dark px-3 py-2">
-                            <i class="fas fa-brain me-1"></i>AI-Powered
-                        </span>
-                        <span class="badge bg-light text-dark px-3 py-2">
-                            <i class="fas fa-bolt me-1"></i>Fast Processing
-                        </span>
-                        <span class="badge bg-light text-dark px-3 py-2">
-                            <i class="fas fa-shield-alt me-1"></i>Secure
-                        </span>
+
+                    <div class="d-flex flex-wrap gap-3 mb-5">
+                        <a href="/summarizer" class="btn btn-primary btn-lg">
+                            <i class="fas fa-rocket me-2"></i>Start Processing Now
+                        </a>
+                        <a href="#features" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-play-circle me-2"></i>Explore Features
+                        </a>
+                    </div>
+
+                    <!-- Trust Indicators -->
+                    <div class="d-flex flex-wrap gap-4 align-items-center" style="opacity: 0.9;">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                            <span style="color: var(--text-secondary); font-size: 0.9375rem; font-weight: 500;">No
+                                signup required</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-shield-alt" style="color: var(--success);"></i>
+                            <span
+                                style="color: var(--text-secondary); font-size: 0.9375rem; font-weight: 500;">Enterprise-grade
+                                security</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-bolt" style="color: var(--success);"></i>
+                            <span
+                                style="color: var(--text-secondary); font-size: 0.9375rem; font-weight: 500;">Lightning-fast
+                                results</span>
+                        </div>
                     </div>
                 </div>
-                <div class="col-lg-6 text-center">
-                    <i class="fas fa-cogs hero-icon text-warning"></i>
+
+                <div class="col-lg-5">
+                    <!-- Stats Cards -->
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="stat-box text-center">
+                                <h3 class="display-5 fw-bold mb-2" style="color: var(--primary);">10x</h3>
+                                <p class="mb-0" style="color: var(--text-secondary); font-size: 0.9375rem;">Faster
+                                    Processing</p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-box text-center">
+                                <h3 class="display-5 fw-bold mb-2" style="color: var(--success);">99%</h3>
+                                <p class="mb-0" style="color: var(--text-secondary); font-size: 0.9375rem;">Accuracy
+                                    Rate</p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-box text-center">
+                                <h3 class="display-5 fw-bold mb-2" style="color: var(--accent);">12+</h3>
+                                <p class="mb-0" style="color: var(--text-secondary); font-size: 0.9375rem;">Languages
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-box text-center">
+                                <h3 class="display-5 fw-bold mb-2" style="color: var(--warning);">24/7</h3>
+                                <p class="mb-0" style="color: var(--text-secondary); font-size: 0.9375rem;">Available
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="py-5">
+    <!-- Premium Features Section -->
+    <section class="py-5" id="features" style="background: var(--bg-primary); padding: 6rem 0 !important;">
         <div class="container">
+            <!-- Section Header -->
             <div class="row text-center mb-5">
                 <div class="col-lg-8 mx-auto">
-                    <h2 class="display-5 fw-bold mb-3">Powerful AI Features</h2>
-                    <p class="lead text-muted">
-                        Everything you need for intelligent communication and content processing
+                    <div class="hero-badge mx-auto mb-4">
+                        <i class="fas fa-magic"></i>
+                        <span>Complete AI Toolkit</span>
+                    </div>
+                    <h2 class="display-4 fw-bold mb-4">Everything You Need for<br><span
+                            class="text-gradient">Intelligent Content Processing</span></h2>
+                    <p class="lead"
+                        style="color: var(--text-secondary); max-width: 720px; margin: 0 auto; line-height: 1.7;">
+                        Enterprise-grade AI capabilities that transform how you work with text, speech, and
+                        communication.
+                        Built for professionals who value quality, speed, and precision.
                     </p>
                 </div>
             </div>
 
+            <!-- Feature Cards Grid -->
             <div class="row g-4">
                 <!-- Text Summarization -->
-                <div class="col-lg-6 col-xl-3">
-                    <div class="feature-card h-100 p-4 text-center">
-                        <div class="feature-icon mb-3">
-                            <i class="fas fa-file-alt text-primary"></i>
+                <div class="col-lg-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-file-alt"></i>
                         </div>
-                        <h4 class="fw-bold mb-3">Text Summarization</h4>
-                        <p class="text-muted mb-4">
-                            Instantly summarize long documents and articles using advanced NLP algorithms.
+                        <h3 class="fw-bold mb-3">AI Text Summarization</h3>
+                        <p class="mb-4" style="color: var(--text-secondary); line-height: 1.7;">
+                            Extract key insights from lengthy documents in seconds using <strong>advanced BART
+                                transformer models</strong>.
+                            Perfect for research papers, reports, articles, and documentation. Get the information you
+                            need without reading everything.
                         </p>
-                        <a href="/summarizer" class="btn btn-primary">
-                            Try Now <i class="fas fa-arrow-right ms-1"></i>
+                        <ul class="list-unstyled mb-4" style="color: var(--text-secondary);">
+                            <li class="mb-2"><i class="fas fa-check-circle me-2"
+                                    style="color: var(--success);"></i>Intelligent abstractive summarization
+                            </li>
+                            <li class="mb-2"><i class="fas fa-check-circle me-2"
+                                    style="color: var(--success);"></i>Flexible length control (short, medium, long)
+                            </li>
+                            <li class="mb-2"><i class="fas fa-check-circle me-2"
+                                    style="color: var(--success);"></i>Multiple formats: paragraphs, bullets, abstracts
+                            </li>
+                            <li class="mb-2"><i class="fas fa-check-circle me-2"
+                                    style="color: var(--success);"></i>Process documents up to 10,000 words</li>
+                        </ul>
+                        <a href="/summarizer" class="btn btn-primary w-100">
+                            Start Summarizing <i class="fas fa-arrow-right ms-2"></i>
                         </a>
                     </div>
                 </div>
 
                 <!-- Language Translation -->
-                <div class="col-lg-6 col-xl-3">
-                    <div class="feature-card h-100 p-4 text-center">
-                        <div class="feature-icon mb-3">
-                            <i class="fas fa-language text-success"></i>
+                <div class="col-lg-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-language"></i>
                         </div>
-                        <h4 class="fw-bold mb-3">Language Translation</h4>
-                        <p class="text-muted mb-4">
-                            Translate text between multiple languages with AI-powered accuracy.
+                        <h3 class="fw-bold mb-3">Multilingual Translation</h3>
+                        <p class="mb-4" style="color: var(--text-secondary); line-height: 1.7;">
+                            Break language barriers with <strong>AI-powered translation across 12+ languages</strong>.
+                            Ideal for global teams, international content, and cross-border communication. Maintain
+                            meaning and context across languages.
                         </p>
-                        <a href="/translator" class="btn btn-success">
-                            Translate <i class="fas fa-arrow-right ms-1"></i>
+                        <ul class="list-unstyled mb-4" style="color: var(--text-secondary);">
+                            <li class="mb-2"><i class="fas fa-check-circle me-2" style="color: var(--success);"></i>12+
+                                major world languages supported</li>
+                            <li class="mb-2"><i class="fas fa-check-circle me-2"
+                                    style="color: var(--success);"></i>Context-aware, natural translations</li>
+                            <li class="mb-2"><i class="fas fa-check-circle me-2"
+                                    style="color: var(--success);"></i>Preserves formatting and tone</li>
+                            <li class="mb-2"><i class="fas fa-check-circle me-2"
+                                    style="color: var(--success);"></i>Real-time translation results</li>
+                        </ul>
+                        <a href="/translator" class="btn btn-success w-100">
+                            Start Translating <i class="fas fa-arrow-right ms-2"></i>
                         </a>
                     </div>
                 </div>
 
                 <!-- Speech Processing -->
-                <div class="col-lg-6 col-xl-3">
-                    <div class="feature-card h-100 p-4 text-center">
-                        <div class="feature-icon mb-3">
-                            <i class="fas fa-microphone text-info"></i>
+                <div class="col-lg-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-microphone"></i>
                         </div>
-                        <h4 class="fw-bold mb-3">Speech Processing</h4>
-                        <p class="text-muted mb-4">
-                            Convert speech to text and text to speech with high accuracy.
+                        <h3 class="fw-bold mb-3">Speech Processing</h3>
+                        <p class="mb-4" style="color: var(--text-secondary); line-height: 1.7;">
+                            Transform audio to text and text to audio with <strong>enterprise-grade accuracy</strong>.
+                            Perfect for meeting transcriptions, content accessibility, podcasts, and voice-enabled
+                            applications.
                         </p>
-                        <a href="/speech" class="btn btn-info">
-                            Process <i class="fas fa-arrow-right ms-1"></i>
+                        <ul class="list-unstyled mb-4" style="color: var(--text-secondary);">
+                            <li class="mb-2"><i class="fas fa-check-circle me-2"
+                                    style="color: var(--success);"></i>High-accuracy speech-to-text</li>
+                            <li class="mb-2"><i class="fas fa-check-circle me-2"
+                                    style="color: var(--success);"></i>Natural text-to-speech synthesis</li>
+                            <li class="mb-2"><i class="fas fa-check-circle me-2"
+                                    style="color: var(--success);"></i>Multiple audio formats supported</li>
+                            <li class="mb-2"><i class="fas fa-check-circle me-2"
+                                    style="color: var(--success);"></i>Professional-quality voices</li>
+                        </ul>
+                        <a href="/speech" class="btn btn-info w-100">
+                            Explore Speech Tools <i class="fas fa-arrow-right ms-2"></i>
                         </a>
                     </div>
                 </div>
 
                 <!-- Email Automation -->
-                <div class="col-lg-6 col-xl-3">
-                    <div class="feature-card h-100 p-4 text-center">
-                        <div class="feature-icon mb-3">
-                            <i class="fas fa-envelope text-warning"></i>
+                <div class="col-lg-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-envelope"></i>
                         </div>
-                        <h4 class="fw-bold mb-3">Email Automation</h4>
-                        <p class="text-muted mb-4">
-                            Generate professional emails and send them automatically via SMTP.
+                        <h3 class="fw-bold mb-3">Smart Email Automation</h3>
+                        <p class="mb-4" style="color: var(--text-secondary); line-height: 1.7;">
+                            Create and send professional emails automatically with <strong>AI-powered
+                                composition</strong>.
+                            Streamline your communication workflow and save hours on email management and outreach.
                         </p>
-                        <a href="/email" class="btn btn-warning">
-                            Send Email <i class="fas fa-arrow-right ms-1"></i>
+                        <ul class="list-unstyled mb-4" style="color: var(--text-secondary);">
+                            <li class="mb-2"><i class="fas fa-check-circle me-2"
+                                    style="color: var(--success);"></i>AI-powered email composition</li>
+                            <li class="mb-2"><i class="fas fa-check-circle me-2"
+                                    style="color: var(--success);"></i>Professional, customizable templates</li>
+                            <li class="mb-2"><i class="fas fa-check-circle me-2"
+                                    style="color: var(--success);"></i>Seamless SMTP integration</li>
+                            <li class="mb-2"><i class="fas fa-check-circle me-2" style="color: var(--success);"></i>Bulk
+                                sending capabilities</li>
+                        </ul>
+                        <a href="/email" class="btn btn-warning w-100">
+                            Automate Emails <i class="fas fa-arrow-right ms-2"></i>
                         </a>
                     </div>
                 </div>
@@ -168,113 +289,192 @@
         </div>
     </section>
 
-    <!-- How It Works Section -->
-    <section class="bg-light py-5">
+    <!-- Use Cases Section -->
+    <section class="py-5" style="background: var(--bg-secondary); padding: 6rem 0 !important;">
         <div class="container">
             <div class="row text-center mb-5">
                 <div class="col-lg-8 mx-auto">
-                    <h2 class="display-5 fw-bold mb-3">How It Works</h2>
-                    <p class="lead text-muted">Simple, powerful, and efficient</p>
+                    <h2 class="display-4 fw-bold mb-4">Trusted by <span class="text-gradient">Professionals
+                            Worldwide</span></h2>
+                    <p class="lead" style="color: var(--text-secondary); line-height: 1.7;">
+                        From startups to enterprises, professionals rely on AutoComm to streamline their workflows
+                    </p>
                 </div>
             </div>
 
             <div class="row g-4">
                 <div class="col-lg-4">
-                    <div class="text-center">
-                        <div class="step-number mb-3">1</div>
-                        <h5 class="fw-bold mb-3">Choose Your Tool</h5>
-                        <p class="text-muted">
-                            Select from our suite of AI-powered communication tools based on your needs.
-                        </p>
+                    <div class="card h-100 text-center">
+                        <div class="card-body p-4">
+                            <div class="mb-3">
+                                <i class="fas fa-briefcase" style="font-size: 2.5rem; color: var(--primary);"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Business Professionals</h4>
+                            <p style="color: var(--text-secondary); line-height: 1.7;">
+                                Streamline report analysis, automate multilingual communications, and manage email
+                                campaigns efficiently. Save 10+ hours per week on routine tasks.
+                            </p>
+                        </div>
                     </div>
                 </div>
+
                 <div class="col-lg-4">
-                    <div class="text-center">
-                        <div class="step-number mb-3">2</div>
-                        <h5 class="fw-bold mb-3">Input Your Data</h5>
-                        <p class="text-muted">
-                            Enter your text, upload audio files, or provide the information you want to process.
-                        </p>
+                    <div class="card h-100 text-center">
+                        <div class="card-body p-4">
+                            <div class="mb-3">
+                                <i class="fas fa-graduation-cap" style="font-size: 2.5rem; color: var(--success);"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Researchers & Academics</h4>
+                            <p style="color: var(--text-secondary); line-height: 1.7;">
+                                Quickly summarize research papers, translate international studies, and transcribe
+                                interviews. Focus on insights, not manual processing.
+                            </p>
+                        </div>
                     </div>
                 </div>
+
                 <div class="col-lg-4">
-                    <div class="text-center">
-                        <div class="step-number mb-3">3</div>
-                        <h5 class="fw-bold mb-3">Get Results</h5>
-                        <p class="text-muted">
-                            Receive instant, accurate results powered by state-of-the-art AI technology.
-                        </p>
+                    <div class="card h-100 text-center">
+                        <div class="card-body p-4">
+                            <div class="mb-3">
+                                <i class="fas fa-pen-fancy" style="font-size: 2.5rem; color: var(--accent);"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Content Creators</h4>
+                            <p style="color: var(--text-secondary); line-height: 1.7;">
+                                Create summaries for long-form content, localize materials for global audiences, and
+                                generate professional outreach emails at scale.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Statistics Section -->
-    <section class="py-5">
-        <div class="container">
-            <div class="row g-4 text-center">
-                <div class="col-6 col-lg-3">
-                    <div class="stat-item">
-                        <h2 class="display-4 fw-bold text-primary mb-2">5+</h2>
-                        <p class="text-muted">AI Features</p>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-3">
-                    <div class="stat-item">
-                        <h2 class="display-4 fw-bold text-success mb-2">12+</h2>
-                        <p class="text-muted">Languages</p>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-3">
-                    <div class="stat-item">
-                        <h2 class="display-4 fw-bold text-info mb-2">99%</h2>
-                        <p class="text-muted">Accuracy</p>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-3">
-                    <div class="stat-item">
-                        <h2 class="display-4 fw-bold text-warning mb-2">24/7</h2>
-                        <p class="text-muted">Available</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-4">
+    <!-- CTA Section -->
+    <section class="py-5" style="background: var(--bg-primary); padding: 6rem 0 !important;">
         <div class="container">
             <div class="row">
-                <div class="col-lg-6">
+                <div class="col-lg-10 mx-auto">
+                    <div class="card"
+                        style="background: var(--gradient-accent); border: none; border-radius: var(--radius-2xl); overflow: hidden;">
+                        <div class="card-body p-5 text-center text-white">
+                            <h2 class="display-5 fw-bold mb-4">Ready to Work Smarter?</h2>
+                            <p class="lead mb-4"
+                                style="opacity: 0.95; max-width: 640px; margin: 0 auto; line-height: 1.7;">
+                                Join thousands of professionals using AI to transform their workflow.
+                                Start processing content intelligently today — no signup, no credit card, completely
+                                free.
+                            </p>
+                            <div class="d-flex flex-wrap gap-3 justify-content-center">
+                                <a href="/summarizer" class="btn btn-lg"
+                                    style="background: white; color: var(--primary); font-weight: 600;">
+                                    <i class="fas fa-rocket me-2"></i>Start Now - It's Free
+                                </a>
+                                <a href="#features" class="btn btn-outline-light btn-lg">
+                                    <i class="fas fa-info-circle me-2"></i>Learn More
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Premium Footer -->
+    <footer class="py-5" style="background: var(--bg-card); border-top: 1px solid var(--border-color);">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4 mb-lg-0">
                     <h5 class="fw-bold mb-3">
-                        <i class="fas fa-robot me-2"></i>AutoComm
+                        <i class="fas fa-bolt me-2" style="color: var(--primary);"></i>AutoComm
                     </h5>
-                    <p class="text-light">
-                        AI-Powered Communication and Content Automation Suite. 
-                        Streamline your workflow with intelligent automation.
+                    <p style="color: var(--text-secondary); line-height: 1.7;">
+                        Enterprise AI Communication Platform. Transform your content workflow with state-of-the-art
+                        machine learning.
                     </p>
                 </div>
-                <div class="col-lg-6">
-                    <h5 class="fw-bold mb-3">Quick Links</h5>
+                <div class="col-lg-2 col-6 mb-4 mb-lg-0">
+                    <h6 class="fw-bold mb-3">Features</h6>
                     <ul class="list-unstyled">
-                        <li><a href="/summarizer" class="text-light text-decoration-none">Text Summarization</a></li>
-                        <li><a href="/translator" class="text-light text-decoration-none">Language Translation</a></li>
-                        <li><a href="/speech" class="text-light text-decoration-none">Speech Processing</a></li>
-                        <li><a href="/email" class="text-light text-decoration-none">Email Automation</a></li>
+                        <li class="mb-2"><a href="/summarizer" class="text-decoration-none"
+                                style="color: var(--text-secondary);">Summarizer</a></li>
+                        <li class="mb-2"><a href="/translator" class="text-decoration-none"
+                                style="color: var(--text-secondary);">Translator</a></li>
+                        <li class="mb-2"><a href="/speech" class="text-decoration-none"
+                                style="color: var(--text-secondary);">Speech</a></li>
+                        <li class="mb-2"><a href="/email" class="text-decoration-none"
+                                style="color: var(--text-secondary);">Email</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-6 mb-4 mb-lg-0">
+                    <h6 class="fw-bold mb-3">Company</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-decoration-none"
+                                style="color: var(--text-secondary);">About</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none"
+                                style="color: var(--text-secondary);">Blog</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none"
+                                style="color: var(--text-secondary);">Careers</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none"
+                                style="color: var(--text-secondary);">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-6 mb-4 mb-lg-0">
+                    <h6 class="fw-bold mb-3">Resources</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-decoration-none"
+                                style="color: var(--text-secondary);">Documentation</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none"
+                                style="color: var(--text-secondary);">API</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none"
+                                style="color: var(--text-secondary);">Support</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none"
+                                style="color: var(--text-secondary);">Status</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-6">
+                    <h6 class="fw-bold mb-3">Legal</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-decoration-none"
+                                style="color: var(--text-secondary);">Privacy</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none"
+                                style="color: var(--text-secondary);">Terms</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none"
+                                style="color: var(--text-secondary);">Security</a></li>
                     </ul>
                 </div>
             </div>
-            <hr class="my-4">
-            <div class="text-center">
-                <p class="mb-0">© 2024 AutoComm. Built with AI and ❤️</p>
+            <hr class="my-4" style="border-color: var(--border-color);">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    <!-- <p class="mb-0" style="color: var(--text-secondary);">© 2024 AutoComm. Built with AI and ❤️</p> -->
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <div class="d-flex gap-3 justify-content-center justify-content-md-end">
+                        <a href="#" style="color: var(--text-muted); font-size: 1.25rem;"><i
+                                class="fab fa-twitter"></i></a>
+                        <a href="#" style="color: var(--text-muted); font-size: 1.25rem;"><i
+                                class="fab fa-github"></i></a>
+                        <a href="#" style="color: var(--text-muted); font-size: 1.25rem;"><i
+                                class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
             </div>
         </div>
     </footer>
 
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <i class="fas fa-moon"></i>
+    </button>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
+
 </html>

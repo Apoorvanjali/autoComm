@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Speech Processing - AutoComm</title>
-    <!-- Bootstrap CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap"
+        rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
 </head>
+
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="/">
                 <i class="fas fa-robot me-2"></i>AutoComm
@@ -23,86 +26,58 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">
-                            <i class="fas fa-home me-1"></i>Home
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/summarizer">
-                            <i class="fas fa-file-alt me-1"></i>Summarizer
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/translator">
-                            <i class="fas fa-language me-1"></i>Translator
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/speech">
-                            <i class="fas fa-microphone me-1"></i>Speech
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/email">
-                            <i class="fas fa-envelope me-1"></i>Email
-                        </a>
+                    <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home me-1"></i>Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/summarizer"><i
+                                class="fas fa-file-alt me-1"></i>Summarizer</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/translator"><i
+                                class="fas fa-language me-1"></i>Translator</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/speech"><i
+                                class="fas fa-microphone me-1"></i>Speech</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/email"><i class="fas fa-envelope me-1"></i>Email</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
     <div class="container my-5">
         <div class="row">
             <div class="col-lg-10 mx-auto">
-                <!-- Header -->
                 <div class="text-center mb-5">
-                    <i class="fas fa-microphone text-info display-1 mb-3"></i>
+                    <div class="mb-4"><i class="fas fa-microphone display-1"
+                            style="color: var(--info); opacity: 0.2;"></i></div>
                     <h1 class="display-4 fw-bold mb-3">Speech Processing</h1>
-                    <p class="lead text-muted">
-                        Convert between speech and text seamlessly with advanced AI technology
-                    </p>
+                    <p class="lead" style="color: var(--text-secondary);">Convert between speech and text seamlessly
+                        with advanced AI technology</p>
                 </div>
 
-                <!-- Feature Tabs -->
                 <ul class="nav nav-tabs nav-justified mb-4" id="speechTabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="speech-to-text-tab" data-bs-toggle="tab" data-bs-target="#speech-to-text" type="button" role="tab">
-                            <i class="fas fa-microphone me-2"></i>
-                            Speech to Text
+                        <button class="nav-link active" id="speech-to-text-tab" data-bs-toggle="tab"
+                            data-bs-target="#speech-to-text" type="button" role="tab">
+                            <i class="fas fa-microphone me-2"></i>Speech to Text
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="text-to-speech-tab" data-bs-toggle="tab" data-bs-target="#text-to-speech" type="button" role="tab">
-                            <i class="fas fa-volume-up me-2"></i>
-                            Text to Speech
+                        <button class="nav-link" id="text-to-speech-tab" data-bs-toggle="tab"
+                            data-bs-target="#text-to-speech" type="button" role="tab">
+                            <i class="fas fa-volume-up me-2"></i>Text to Speech
                         </button>
                     </li>
                 </ul>
 
-                <!-- Tab Content -->
                 <div class="tab-content" id="speechTabContent">
-                    
-                    <!-- Speech to Text Tab -->
                     <div class="tab-pane fade show active" id="speech-to-text" role="tabpanel">
                         <div class="card shadow-lg">
-                            <div class="card-header bg-info text-white">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-microphone me-2"></i>
-                                    Convert Speech to Text
-                                </h5>
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-microphone me-2"></i>Convert Speech to Text</h5>
                             </div>
                             <div class="card-body">
                                 <form id="speechToTextForm" enctype="multipart/form-data">
-                                    <!-- Language Selection -->
                                     <div class="row mb-4">
                                         <div class="col-md-6">
-                                            <label for="speechLanguage" class="form-label fw-bold">
-                                                <i class="fas fa-flag me-1"></i>
-                                                Speech Language
-                                            </label>
+                                            <label for="speechLanguage" class="form-label fw-bold"><i
+                                                    class="fas fa-flag me-1"></i>Speech Language</label>
                                             <select id="speechLanguage" class="form-select">
                                                 <option value="en-US">English (US)</option>
                                                 <option value="en-GB">English (UK)</option>
@@ -119,59 +94,47 @@
                                             </select>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label fw-bold">
-                                                <i class="fas fa-info-circle me-1"></i>
-                                                File Requirements
-                                            </label>
+                                            <label class="form-label fw-bold"><i
+                                                    class="fas fa-info-circle me-1"></i>File Requirements</label>
                                             <div class="form-text">
                                                 <ul class="list-unstyled mb-0">
-                                                    <li><i class="fas fa-check text-success me-1"></i> Formats: WAV, MP3, M4A</li>
-                                                    <li><i class="fas fa-check text-success me-1"></i> Max size: 10MB</li>
-                                                    <li><i class="fas fa-check text-success me-1"></i> Clear audio quality</li>
+                                                    <li><i class="fas fa-check me-1" style="color: var(--success);"></i>
+                                                        Formats: WAV, MP3, M4A</li>
+                                                    <li><i class="fas fa-check me-1" style="color: var(--success);"></i>
+                                                        Max size: 10MB</li>
+                                                    <li><i class="fas fa-check me-1" style="color: var(--success);"></i>
+                                                        Clear audio quality</li>
                                                 </ul>
                                             </div>
                                         </div>
                                     </div>
-
-                                    <!-- File Upload -->
                                     <div class="mb-4">
-                                        <label for="audioFile" class="form-label fw-bold">
-                                            <i class="fas fa-file-audio me-1"></i>
-                                            Upload Audio File
-                                        </label>
-                                        <input type="file" id="audioFile" class="form-control" accept="audio/*" required>
-                                        <div class="form-text">
-                                            <i class="fas fa-upload me-1"></i>
-                                            Select an audio file to convert to text
-                                        </div>
+                                        <label for="audioFile" class="form-label fw-bold"><i
+                                                class="fas fa-file-audio me-1"></i>Upload Audio File</label>
+                                        <input type="file" id="audioFile" class="form-control" accept="audio/*"
+                                            required>
+                                        <div class="form-text"><i class="fas fa-upload me-1"></i>Select an audio file to
+                                            convert to text</div>
                                     </div>
-
-                                    <!-- Submit Button -->
                                     <div class="d-grid">
                                         <button type="submit" class="btn btn-info btn-lg" id="convertSpeechBtn">
-                                            <i class="fas fa-microphone-alt me-2"></i>
-                                            Convert Speech to Text
+                                            <i class="fas fa-microphone-alt me-2"></i>Convert Speech to Text
                                         </button>
                                     </div>
                                 </form>
-
-                                <!-- Speech to Text Results -->
                                 <div id="speechResults" class="mt-4" style="display: none;">
                                     <hr>
-                                    <h6 class="fw-bold mb-3">
-                                        <i class="fas fa-file-alt me-2"></i>
-                                        Transcription Results
+                                    <h6 class="fw-bold mb-3"><i class="fas fa-file-alt me-2"></i>Transcription Results
                                     </h6>
-                                    <div class="card bg-light">
+                                    <div class="card" style="background: var(--bg-secondary);">
                                         <div class="card-body">
                                             <div id="transcriptionText" class="mb-3"></div>
                                             <div class="d-flex gap-2">
-                                                <button id="copySpeechResult" class="btn btn-outline-primary btn-sm">
-                                                    <i class="fas fa-copy me-1"></i>Copy
-                                                </button>
-                                                <button id="downloadSpeechResult" class="btn btn-outline-success btn-sm">
-                                                    <i class="fas fa-download me-1"></i>Download
-                                                </button>
+                                                <button id="copySpeechResult" class="btn btn-outline-primary btn-sm"><i
+                                                        class="fas fa-copy me-1"></i>Copy</button>
+                                                <button id="downloadSpeechResult"
+                                                    class="btn btn-outline-success btn-sm"><i
+                                                        class="fas fa-download me-1"></i>Download</button>
                                             </div>
                                         </div>
                                     </div>
@@ -180,43 +143,27 @@
                         </div>
                     </div>
 
-                    <!-- Text to Speech Tab -->
                     <div class="tab-pane fade" id="text-to-speech" role="tabpanel">
                         <div class="card shadow-lg">
-                            <div class="card-header bg-warning text-dark">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-volume-up me-2"></i>
-                                    Convert Text to Speech
-                                </h5>
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-volume-up me-2"></i>Convert Text to Speech</h5>
                             </div>
                             <div class="card-body">
                                 <form id="textToSpeechForm">
-                                    <!-- Text Input -->
                                     <div class="mb-4">
-                                        <label for="textToSpeak" class="form-label fw-bold">
-                                            <i class="fas fa-edit me-1"></i>
-                                            Text to Convert (Max 5000 characters)
-                                        </label>
-                                        <textarea 
-                                            id="textToSpeak" 
-                                            class="form-control" 
-                                            rows="6" 
+                                        <label for="textToSpeak" class="form-label fw-bold"><i
+                                                class="fas fa-edit me-1"></i>Text to Convert (Max 5000
+                                            characters)</label>
+                                        <textarea id="textToSpeak" class="form-control" rows="6"
                                             placeholder="Enter the text you want to convert to speech..."
-                                            maxlength="5000"
-                                            required
-                                        ></textarea>
-                                        <div class="form-text">
-                                            Characters: <span id="textCharCount">0</span> / 5000
+                                            maxlength="5000" required></textarea>
+                                        <div class="form-text">Characters: <span id="textCharCount">0</span> / 5000
                                         </div>
                                     </div>
-
-                                    <!-- Voice Settings -->
                                     <div class="row mb-4">
                                         <div class="col-md-6">
-                                            <label for="voiceLanguage" class="form-label fw-bold">
-                                                <i class="fas fa-globe me-1"></i>
-                                                Voice Language
-                                            </label>
+                                            <label for="voiceLanguage" class="form-label fw-bold"><i
+                                                    class="fas fa-globe me-1"></i>Voice Language</label>
                                             <select id="voiceLanguage" class="form-select">
                                                 <option value="en">English</option>
                                                 <option value="es">Spanish</option>
@@ -233,45 +180,30 @@
                                             </select>
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="speechSpeed" class="form-label fw-bold">
-                                                <i class="fas fa-tachometer-alt me-1"></i>
-                                                Speech Speed
-                                            </label>
+                                            <label for="speechSpeed" class="form-label fw-bold"><i
+                                                    class="fas fa-tachometer-alt me-1"></i>Speech Speed</label>
                                             <select id="speechSpeed" class="form-select">
                                                 <option value="false">Normal</option>
                                                 <option value="true">Slow</option>
                                             </select>
                                         </div>
                                     </div>
-
-                                    <!-- Submit Button -->
                                     <div class="d-grid">
-                                        <button type="submit" class="btn btn-warning btn-lg" id="generateSpeechBtn">
-                                            <i class="fas fa-volume-up me-2"></i>
-                                            Generate Speech
-                                        </button>
+                                        <button type="submit" class="btn btn-warning btn-lg" id="generateSpeechBtn"><i
+                                                class="fas fa-volume-up me-2"></i>Generate Speech</button>
                                     </div>
                                 </form>
-
-                                <!-- Text to Speech Results -->
                                 <div id="speechGenerationResults" class="mt-4" style="display: none;">
                                     <hr>
-                                    <h6 class="fw-bold mb-3">
-                                        <i class="fas fa-file-audio me-2"></i>
-                                        Generated Audio
-                                    </h6>
-                                    <div class="card bg-light">
+                                    <h6 class="fw-bold mb-3"><i class="fas fa-file-audio me-2"></i>Generated Audio</h6>
+                                    <div class="card" style="background: var(--bg-secondary);">
                                         <div class="card-body text-center">
-                                            <div id="audioPlayer" class="mb-3">
-                                                <!-- Audio player will be inserted here -->
-                                            </div>
+                                            <div id="audioPlayer" class="mb-3"></div>
                                             <div class="d-flex justify-content-center gap-2">
-                                                <button id="downloadAudio" class="btn btn-outline-success">
-                                                    <i class="fas fa-download me-1"></i>Download Audio
-                                                </button>
-                                                <button id="newTextToSpeech" class="btn btn-outline-secondary">
-                                                    <i class="fas fa-plus me-1"></i>Generate New
-                                                </button>
+                                                <button id="downloadAudio" class="btn btn-outline-success"><i
+                                                        class="fas fa-download me-1"></i>Download Audio</button>
+                                                <button id="newTextToSpeech" class="btn btn-outline-secondary"><i
+                                                        class="fas fa-plus me-1"></i>Generate New</button>
                                             </div>
                                         </div>
                                     </div>
@@ -281,75 +213,49 @@
                     </div>
                 </div>
 
-                <!-- Loading Spinner -->
                 <div id="loadingSpinner" class="text-center my-4" style="display: none;">
-                    <div class="spinner-border text-info" role="status">
-                        <span class="visually-hidden">Processing...</span>
-                    </div>
-                    <p class="mt-2 text-muted">
-                        <i class="fas fa-cog fa-spin me-1"></i>
-                        <span id="loadingMessage">Processing audio...</span>
-                    </p>
+                    <div class="spinner-border" style="color: var(--info);" role="status"><span
+                            class="visually-hidden">Processing...</span></div>
+                    <p class="mt-2" style="color: var(--text-secondary);"><i class="fas fa-cog fa-spin me-1"></i><span
+                            id="loadingMessage">Processing audio...</span></p>
                 </div>
 
-                <!-- Error Display -->
                 <div id="errorSection" class="mt-4" style="display: none;">
-                    <div class="alert alert-danger" role="alert">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        <strong>Error:</strong> <span id="errorMessage"></span>
-                    </div>
+                    <div class="alert alert-danger" role="alert"><i
+                            class="fas fa-exclamation-triangle me-2"></i><strong>Error:</strong> <span
+                            id="errorMessage"></span></div>
                 </div>
 
-                <!-- Tips Section -->
                 <div class="card mt-4">
                     <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="fas fa-lightbulb me-2"></i>
-                            Speech Processing Tips
-                        </h5>
+                        <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Speech Processing Tips</h5>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <h6 class="fw-bold text-info mb-3">Speech to Text Tips</h6>
+                                <h6 class="fw-bold mb-3" style="color: var(--info);">Speech to Text Tips</h6>
                                 <ul class="list-unstyled">
-                                    <li class="mb-2">
-                                        <i class="fas fa-check text-success me-2"></i>
-                                        Use clear, high-quality audio recordings
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="fas fa-check text-success me-2"></i>
-                                        Minimize background noise
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="fas fa-check text-success me-2"></i>
-                                        Speak at a moderate pace
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="fas fa-check text-success me-2"></i>
-                                        Ensure proper microphone positioning
-                                    </li>
+                                    <li class="mb-2"><i class="fas fa-check me-2" style="color: var(--success);"></i>Use
+                                        clear, high-quality audio recordings</li>
+                                    <li class="mb-2"><i class="fas fa-check me-2"
+                                            style="color: var(--success);"></i>Minimize background noise</li>
+                                    <li class="mb-2"><i class="fas fa-check me-2"
+                                            style="color: var(--success);"></i>Speak at a moderate pace</li>
+                                    <li class="mb-2"><i class="fas fa-check me-2"
+                                            style="color: var(--success);"></i>Ensure proper microphone positioning</li>
                                 </ul>
                             </div>
                             <div class="col-md-6">
-                                <h6 class="fw-bold text-warning mb-3">Text to Speech Tips</h6>
+                                <h6 class="fw-bold mb-3" style="color: var(--warning);">Text to Speech Tips</h6>
                                 <ul class="list-unstyled">
-                                    <li class="mb-2">
-                                        <i class="fas fa-check text-success me-2"></i>
-                                        Use punctuation for natural pauses
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="fas fa-check text-success me-2"></i>
-                                        Avoid special characters and symbols
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="fas fa-check text-success me-2"></i>
-                                        Break long texts into paragraphs
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="fas fa-check text-success me-2"></i>
-                                        Choose appropriate language settings
-                                    </li>
+                                    <li class="mb-2"><i class="fas fa-check me-2" style="color: var(--success);"></i>Use
+                                        punctuation for natural pauses</li>
+                                    <li class="mb-2"><i class="fas fa-check me-2"
+                                            style="color: var(--success);"></i>Avoid special characters and symbols</li>
+                                    <li class="mb-2"><i class="fas fa-check me-2"
+                                            style="color: var(--success);"></i>Break long texts into paragraphs</li>
+                                    <li class="mb-2"><i class="fas fa-check me-2"
+                                            style="color: var(--success);"></i>Choose appropriate language settings</li>
                                 </ul>
                             </div>
                         </div>
@@ -359,14 +265,10 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    
-    <!-- Speech Processing JavaScript -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const speechToTextForm = document.getElementById('speechToTextForm');
             const textToSpeechForm = document.getElementById('textToSpeechForm');
             const textToSpeak = document.getElementById('textToSpeak');
@@ -374,174 +276,83 @@
             const loadingSpinner = document.getElementById('loadingSpinner');
             const loadingMessage = document.getElementById('loadingMessage');
             const errorSection = document.getElementById('errorSection');
-            
-            // Character counter for text-to-speech
-            textToSpeak.addEventListener('input', function() {
-                textCharCount.textContent = this.value.length;
-            });
-            
-            // Speech to Text Form
-            speechToTextForm.addEventListener('submit', async function(e) {
+
+            textToSpeak.addEventListener('input', function () { textCharCount.textContent = this.value.length; });
+
+            speechToTextForm.addEventListener('submit', async function (e) {
                 e.preventDefault();
-                
                 const formData = new FormData();
                 const audioFile = document.getElementById('audioFile').files[0];
                 const language = document.getElementById('speechLanguage').value;
-                
-                if (!audioFile) {
-                    showError('Please select an audio file.');
-                    return;
-                }
-                
-                // Check file size (10MB limit)
-                if (audioFile.size > 10 * 1024 * 1024) {
-                    showError('Audio file size must be less than 10MB.');
-                    return;
-                }
-                
+                if (!audioFile) { showError('Please select an audio file.'); return; }
+                if (audioFile.size > 10 * 1024 * 1024) { showError('Audio file size must be less than 10MB.'); return; }
                 formData.append('audio', audioFile);
                 formData.append('language', language);
-                
                 showLoading('Converting speech to text...');
                 hideError();
-                
                 try {
-                    const response = await fetch('/api/speech-to-text', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    
+                    const response = await fetch('/api/speech-to-text', { method: 'POST', body: formData });
                     const data = await response.json();
-                    
-                    if (data.success) {
-                        displaySpeechResults(data.text);
-                    } else {
-                        showError(data.error || 'Speech conversion failed');
-                    }
-                } catch (error) {
-                    showError('Network error. Please try again.');
-                }
-                
+                    if (data.success) { displaySpeechResults(data.text); } else { showError(data.error || 'Speech conversion failed'); }
+                } catch (error) { showError('Network error. Please try again.'); }
                 hideLoading();
             });
-            
-            // Text to Speech Form
-            textToSpeechForm.addEventListener('submit', async function(e) {
+
+            textToSpeechForm.addEventListener('submit', async function (e) {
                 e.preventDefault();
-                
                 const text = textToSpeak.value.trim();
                 const language = document.getElementById('voiceLanguage').value;
                 const slow = document.getElementById('speechSpeed').value === 'true';
-                
-                if (!text) {
-                    showError('Please enter text to convert to speech.');
-                    return;
-                }
-                
+                if (!text) { showError('Please enter text to convert to speech.'); return; }
                 showLoading('Generating speech audio...');
                 hideError();
-                
                 try {
                     const response = await fetch('/api/text-to-speech', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            text: text,
-                            language: language,
-                            slow: slow
-                        })
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: text, language: language, slow: slow })
                     });
-                    
-                    if (response.ok) {
-                        const blob = await response.blob();
-                        displayAudioResults(blob);
-                    } else {
-                        const data = await response.json();
-                        showError(data.error || 'Text-to-speech conversion failed');
-                    }
-                } catch (error) {
-                    showError('Network error. Please try again.');
-                }
-                
+                    if (response.ok) { const blob = await response.blob(); displayAudioResults(blob); } else { const data = await response.json(); showError(data.error || 'Text-to-speech conversion failed'); }
+                } catch (error) { showError('Network error. Please try again.'); }
                 hideLoading();
             });
-            
-            function showLoading(message = 'Processing...') {
-                loadingMessage.textContent = message;
-                loadingSpinner.style.display = 'block';
-            }
-            
-            function hideLoading() {
-                loadingSpinner.style.display = 'none';
-            }
-            
-            function showError(message) {
-                document.getElementById('errorMessage').textContent = message;
-                errorSection.style.display = 'block';
-            }
-            
-            function hideError() {
-                errorSection.style.display = 'none';
-            }
-            
+
+            function showLoading(message = 'Processing...') { loadingMessage.textContent = message; loadingSpinner.style.display = 'block'; }
+            function hideLoading() { loadingSpinner.style.display = 'none'; }
+            function showError(message) { document.getElementById('errorMessage').textContent = message; errorSection.style.display = 'block'; }
+            function hideError() { errorSection.style.display = 'none'; }
+
             function displaySpeechResults(text) {
                 document.getElementById('transcriptionText').textContent = text;
                 document.getElementById('speechResults').style.display = 'block';
-                
-                // Setup action buttons
-                document.getElementById('copySpeechResult').onclick = function() {
+                document.getElementById('copySpeechResult').onclick = function () {
                     navigator.clipboard.writeText(text);
                     this.innerHTML = '<i class="fas fa-check me-1"></i>Copied!';
-                    setTimeout(() => {
-                        this.innerHTML = '<i class="fas fa-copy me-1"></i>Copy';
-                    }, 2000);
+                    setTimeout(() => { this.innerHTML = '<i class="fas fa-copy me-1"></i>Copy'; }, 2000);
                 };
-                
-                document.getElementById('downloadSpeechResult').onclick = function() {
+                document.getElementById('downloadSpeechResult').onclick = function () {
                     const blob = new Blob([text], { type: 'text/plain' });
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'transcription.txt';
-                    a.click();
+                    a.href = url; a.download = 'transcription.txt'; a.click();
                     window.URL.revokeObjectURL(url);
                 };
             }
-            
+
             function displayAudioResults(audioBlob) {
                 const audioUrl = URL.createObjectURL(audioBlob);
-                
-                // Create audio player
                 const audioPlayer = document.getElementById('audioPlayer');
-                audioPlayer.innerHTML = `
-                    <audio controls class="w-100">
-                        <source src="${audioUrl}" type="audio/mpeg">
-                        Your browser does not support the audio element.
-                    </audio>
-                `;
-                
+                audioPlayer.innerHTML = '<audio controls class="w-100"><source src="' + audioUrl + '" type="audio/mpeg">Your browser does not support the audio element.</audio>';
                 document.getElementById('speechGenerationResults').style.display = 'block';
-                
-                // Setup download button
-                document.getElementById('downloadAudio').onclick = function() {
-                    const a = document.createElement('a');
-                    a.href = audioUrl;
-                    a.download = 'speech.mp3';
-                    a.click();
-                };
-                
-                // Setup new generation button
-                document.getElementById('newTextToSpeech').onclick = function() {
+                document.getElementById('downloadAudio').onclick = function () { const a = document.createElement('a'); a.href = audioUrl; a.download = 'speech.mp3'; a.click(); };
+                document.getElementById('newTextToSpeech').onclick = function () {
                     document.getElementById('speechGenerationResults').style.display = 'none';
-                    textToSpeak.value = '';
-                    textCharCount.textContent = '0';
-                    textToSpeak.focus();
+                    textToSpeak.value = ''; textCharCount.textContent = '0'; textToSpeak.focus();
                     URL.revokeObjectURL(audioUrl);
                 };
             }
         });
     </script>
 </body>
+
 </html>

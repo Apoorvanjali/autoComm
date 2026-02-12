@@ -1,9 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Language Translator - AutoComm</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap"
+        rel="stylesheet">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -11,9 +18,10 @@
     <!-- Custom CSS -->
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
 </head>
+
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="/">
                 <i class="fas fa-robot me-2"></i>AutoComm
@@ -59,16 +67,18 @@
             <div class="col-lg-10 mx-auto">
                 <!-- Header -->
                 <div class="text-center mb-5">
-                    <i class="fas fa-language text-success display-1 mb-3"></i>
+                    <div class="mb-4">
+                        <i class="fas fa-language display-1" style="color: var(--success); opacity: 0.2;"></i>
+                    </div>
                     <h1 class="display-4 fw-bold mb-3">Language Translator</h1>
-                    <p class="lead text-muted">
+                    <p class="lead" style="color: var(--text-secondary);">
                         Break language barriers with AI-powered translation across multiple languages
                     </p>
                 </div>
 
                 <!-- Translation Form -->
                 <div class="card shadow-lg">
-                    <div class="card-header bg-success text-white">
+                    <div class="card-header">
                         <h5 class="mb-0">
                             <i class="fas fa-globe me-2"></i>
                             Translate Text
@@ -99,13 +109,13 @@
                                         <option value="hi">Hindi</option>
                                     </select>
                                 </div>
-                                
+
                                 <div class="col-md-2 text-center d-flex align-items-end">
                                     <button type="button" id="swapLanguages" class="btn btn-outline-success w-100 mb-3">
                                         <i class="fas fa-exchange-alt"></i>
                                     </button>
                                 </div>
-                                
+
                                 <div class="col-md-5">
                                     <label for="targetLanguage" class="form-label fw-bold">
                                         <i class="fas fa-flag me-1"></i>
@@ -135,26 +145,22 @@
                                         <i class="fas fa-edit me-1"></i>
                                         Original Text
                                     </label>
-                                    <textarea 
-                                        id="sourceText" 
-                                        class="form-control" 
-                                        rows="8" 
-                                        placeholder="Enter text to translate..."
-                                        required
-                                    ></textarea>
+                                    <textarea id="sourceText" class="form-control" rows="8"
+                                        placeholder="Enter text to translate..." required></textarea>
                                     <div class="form-text">
                                         <i class="fas fa-info-circle me-1"></i>
                                         Characters: <span id="sourceCharCount">0</span>
                                     </div>
                                 </div>
-                                
+
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">
                                         <i class="fas fa-language me-1"></i>
                                         Translated Text
                                     </label>
-                                    <div id="translationOutput" class="form-control translation-output" style="min-height: 200px; background-color: #f8f9fa;">
-                                        <div class="text-muted text-center h-100 d-flex align-items-center justify-content-center">
+                                    <div id="translationOutput" class="translation-output">
+                                        <div class="text-center h-100 d-flex align-items-center justify-content-center"
+                                            style="color: var(--text-muted);">
                                             <i class="fas fa-arrow-left me-2"></i>
                                             Translation will appear here
                                         </div>
@@ -178,11 +184,13 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="d-flex gap-2">
-                                        <button type="button" id="clearText" class="btn btn-outline-secondary flex-fill">
+                                        <button type="button" id="clearText"
+                                            class="btn btn-outline-secondary flex-fill">
                                             <i class="fas fa-trash me-1"></i>
                                             Clear
                                         </button>
-                                        <button type="button" id="copyTranslation" class="btn btn-outline-success flex-fill" disabled>
+                                        <button type="button" id="copyTranslation"
+                                            class="btn btn-outline-success flex-fill" disabled>
                                             <i class="fas fa-copy me-1"></i>
                                             Copy
                                         </button>
@@ -195,10 +203,10 @@
 
                 <!-- Loading Spinner -->
                 <div id="loadingSpinner" class="text-center my-4" style="display: none;">
-                    <div class="spinner-border text-success" role="status">
+                    <div class="spinner-border" style="color: var(--success);" role="status">
                         <span class="visually-hidden">Translating...</span>
                     </div>
-                    <p class="mt-2 text-muted">
+                    <p class="mt-2" style="color: var(--text-secondary);">
                         <i class="fas fa-globe me-1"></i>
                         AI is translating your text...
                     </p>
@@ -223,28 +231,22 @@
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-lg-4">
-                                <button class="btn btn-outline-primary w-100 example-btn" 
-                                        data-text="Hello, how are you today?" 
-                                        data-from="en" 
-                                        data-to="es">
+                                <button class="btn btn-outline-primary w-100 example-btn"
+                                    data-text="Hello, how are you today?" data-from="en" data-to="es">
                                     <i class="fas fa-comments me-2"></i>
                                     Greeting (EN → ES)
                                 </button>
                             </div>
                             <div class="col-lg-4">
-                                <button class="btn btn-outline-info w-100 example-btn" 
-                                        data-text="Thank you for your help" 
-                                        data-from="en" 
-                                        data-to="fr">
+                                <button class="btn btn-outline-info w-100 example-btn"
+                                    data-text="Thank you for your help" data-from="en" data-to="fr">
                                     <i class="fas fa-heart me-2"></i>
                                     Gratitude (EN → FR)
                                 </button>
                             </div>
                             <div class="col-lg-4">
-                                <button class="btn btn-outline-warning w-100 example-btn" 
-                                        data-text="Good morning, have a great day!" 
-                                        data-from="en" 
-                                        data-to="de">
+                                <button class="btn btn-outline-warning w-100 example-btn"
+                                    data-text="Good morning, have a great day!" data-from="en" data-to="de">
                                     <i class="fas fa-sun me-2"></i>
                                     Wishes (EN → DE)
                                 </button>
@@ -267,19 +269,19 @@
                                 <h6 class="fw-bold mb-3">Popular Languages</h6>
                                 <ul class="list-unstyled">
                                     <li class="mb-2">
-                                        <i class="fas fa-globe text-primary me-2"></i>
+                                        <i class="fas fa-globe me-2" style="color: var(--primary);"></i>
                                         English, Spanish, French, German
                                     </li>
                                     <li class="mb-2">
-                                        <i class="fas fa-globe text-success me-2"></i>
+                                        <i class="fas fa-globe me-2" style="color: var(--success);"></i>
                                         Italian, Portuguese, Russian
                                     </li>
                                     <li class="mb-2">
-                                        <i class="fas fa-globe text-info me-2"></i>
+                                        <i class="fas fa-globe me-2" style="color: var(--info);"></i>
                                         Japanese, Korean, Chinese
                                     </li>
                                     <li class="mb-2">
-                                        <i class="fas fa-globe text-warning me-2"></i>
+                                        <i class="fas fa-globe me-2" style="color: var(--warning);"></i>
                                         Arabic, Hindi
                                     </li>
                                 </ul>
@@ -288,19 +290,19 @@
                                 <h6 class="fw-bold mb-3">Translation Tips</h6>
                                 <ul class="list-unstyled">
                                     <li class="mb-2">
-                                        <i class="fas fa-check text-success me-2"></i>
+                                        <i class="fas fa-check me-2" style="color: var(--success);"></i>
                                         Use clear, simple sentences
                                     </li>
                                     <li class="mb-2">
-                                        <i class="fas fa-check text-success me-2"></i>
+                                        <i class="fas fa-check me-2" style="color: var(--success);"></i>
                                         Avoid idioms and slang
                                     </li>
                                     <li class="mb-2">
-                                        <i class="fas fa-check text-success me-2"></i>
+                                        <i class="fas fa-check me-2" style="color: var(--success);"></i>
                                         Context matters for accuracy
                                     </li>
                                     <li class="mb-2">
-                                        <i class="fas fa-check text-success me-2"></i>
+                                        <i class="fas fa-check me-2" style="color: var(--success);"></i>
                                         Review translations for nuance
                                     </li>
                                 </ul>
@@ -316,10 +318,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    
+
     <!-- Translator specific JavaScript -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const form = document.getElementById('translatorForm');
             const sourceText = document.getElementById('sourceText');
             const sourceCharCount = document.getElementById('sourceCharCount');
@@ -329,60 +331,60 @@
             const targetLanguage = document.getElementById('targetLanguage');
             const loadingSpinner = document.getElementById('loadingSpinner');
             const errorSection = document.getElementById('errorSection');
-            
+
             let currentTranslation = '';
-            
+
             // Character counter for source text
-            sourceText.addEventListener('input', function() {
+            sourceText.addEventListener('input', function () {
                 sourceCharCount.textContent = this.value.length;
             });
-            
+
             // Swap languages
-            document.getElementById('swapLanguages').addEventListener('click', function() {
+            document.getElementById('swapLanguages').addEventListener('click', function () {
                 const sourceVal = sourceLanguage.value;
                 const targetVal = targetLanguage.value;
-                
+
                 if (sourceVal !== 'auto') {
                     sourceLanguage.value = targetVal;
                 }
                 targetLanguage.value = sourceVal === 'auto' ? 'en' : sourceVal;
-                
+
                 if (currentTranslation) {
                     sourceText.value = currentTranslation;
-                    translationOutput.innerHTML = '<div class="text-muted text-center h-100 d-flex align-items-center justify-content-center"><i class="fas fa-arrow-left me-2"></i>Translation will appear here</div>';
+                    translationOutput.innerHTML = '<div class="text-center h-100 d-flex align-items-center justify-content-center" style="color: var(--text-muted);"><i class="fas fa-arrow-left me-2"></i>Translation will appear here</div>';
                     currentTranslation = '';
                 }
             });
-            
+
             // Example buttons
             document.querySelectorAll('.example-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     const text = this.dataset.text;
                     const from = this.dataset.from;
                     const to = this.dataset.to;
-                    
+
                     sourceText.value = text;
                     sourceLanguage.value = from;
                     targetLanguage.value = to;
                     sourceCharCount.textContent = text.length;
-                    
+
                     form.dispatchEvent(new Event('submit'));
                 });
             });
-            
+
             // Clear text
-            document.getElementById('clearText').addEventListener('click', function() {
+            document.getElementById('clearText').addEventListener('click', function () {
                 sourceText.value = '';
-                translationOutput.innerHTML = '<div class="text-muted text-center h-100 d-flex align-items-center justify-content-center"><i class="fas fa-arrow-left me-2"></i>Translation will appear here</div>';
+                translationOutput.innerHTML = '<div class="text-center h-100 d-flex align-items-center justify-content-center" style="color: var(--text-muted);"><i class="fas fa-arrow-left me-2"></i>Translation will appear here</div>';
                 sourceCharCount.textContent = '0';
                 translationCharCount.textContent = '0';
                 currentTranslation = '';
                 document.getElementById('copyTranslation').disabled = true;
                 hideError();
             });
-            
+
             // Copy translation
-            document.getElementById('copyTranslation').addEventListener('click', function() {
+            document.getElementById('copyTranslation').addEventListener('click', function () {
                 if (currentTranslation) {
                     navigator.clipboard.writeText(currentTranslation);
                     this.innerHTML = '<i class="fas fa-check me-1"></i>Copied!';
@@ -391,28 +393,28 @@
                     }, 2000);
                 }
             });
-            
+
             // Form submission
-            form.addEventListener('submit', async function(e) {
+            form.addEventListener('submit', async function (e) {
                 e.preventDefault();
-                
+
                 const text = sourceText.value.trim();
                 if (!text) {
                     showError('Please enter text to translate.');
                     return;
                 }
-                
+
                 const sourceLang = sourceLanguage.value;
                 const targetLang = targetLanguage.value;
-                
+
                 if (sourceLang === targetLang && sourceLang !== 'auto') {
                     showError('Source and target languages cannot be the same.');
                     return;
                 }
-                
+
                 showLoading();
                 hideError();
-                
+
                 try {
                     const response = await fetch('/api/translate', {
                         method: 'POST',
@@ -425,9 +427,9 @@
                             target_language: targetLang
                         })
                     });
-                    
+
                     const data = await response.json();
-                    
+
                     if (data.success) {
                         displayTranslation(data.translation);
                     } else {
@@ -436,34 +438,35 @@
                 } catch (error) {
                     showError('Network error. Please try again.');
                 }
-                
+
                 hideLoading();
             });
-            
+
             function showLoading() {
                 loadingSpinner.style.display = 'block';
             }
-            
+
             function hideLoading() {
                 loadingSpinner.style.display = 'none';
             }
-            
+
             function showError(message) {
                 document.getElementById('errorMessage').textContent = message;
                 errorSection.style.display = 'block';
             }
-            
+
             function hideError() {
                 errorSection.style.display = 'none';
             }
-            
+
             function displayTranslation(translation) {
                 currentTranslation = translation;
-                translationOutput.innerHTML = `<div class="translation-text">${translation}</div>`;
+                translationOutput.innerHTML = `<div class="translation-text" style="color: var(--text-primary);">${translation}</div>`;
                 translationCharCount.textContent = translation.length;
                 document.getElementById('copyTranslation').disabled = false;
             }
         });
     </script>
 </body>
+
 </html>
