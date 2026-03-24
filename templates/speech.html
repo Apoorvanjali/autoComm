@@ -10,6 +10,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap"
         rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
@@ -25,16 +26,28 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home me-1"></i>Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/summarizer"><i
-                                class="fas fa-file-alt me-1"></i>Summarizer</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/translator"><i
-                                class="fas fa-language me-1"></i>Translator</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="/speech"><i
-                                class="fas fa-microphone me-1"></i>Speech</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/email"><i class="fas fa-envelope me-1"></i>Email</a>
+                    <li class="nav-item"><a class="nav-link" href="/summarizer"><i class="fas fa-file-alt me-1"></i>Summarizer</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/translator"><i class="fas fa-language me-1"></i>Translator</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/speech"><i class="fas fa-microphone me-1"></i>Speech</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/email"><i class="fas fa-envelope me-1"></i>Email</a></li>
+                    {% if session.get('logged_in') %}
+                    <li class="nav-item ms-2">
+                        <a href="/logout" class="btn btn-outline-primary btn-sm" style="padding:0.5rem 1.125rem;">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </a>
                     </li>
+                    {% else %}
+                    <li class="nav-item ms-2">
+                        <a class="nav-link" href="/login" style="font-weight:600;">Sign In</a>
+                    </li>
+                    <li class="nav-item ms-1">
+                        <a href="/signup" class="btn btn-primary btn-sm" style="padding:0.5rem 1.125rem;">
+                            <i class="fas fa-user-plus me-1"></i>Get Started
+                        </a>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
@@ -76,11 +89,14 @@
                                 <form id="speechToTextForm" enctype="multipart/form-data">
                                     <div class="row mb-4">
                                         <div class="col-md-6">
-                                            <label for="speechLanguage" class="form-label fw-bold"><i
-                                                    class="fas fa-flag me-1"></i>Speech Language</label>
+                                            <label for="speechLanguage" class="form-label fw-bold">
+                                                <i class="fas fa-microphone me-1"></i>Audio Language
+                                                <small class="text-muted fw-normal ms-1">(spoken in the file)</small>
+                                            </label>
                                             <select id="speechLanguage" class="form-select">
                                                 <option value="en-US">English (US)</option>
                                                 <option value="en-GB">English (UK)</option>
+                                                <option value="hi-IN">Hindi</option>
                                                 <option value="es-ES">Spanish (Spain)</option>
                                                 <option value="es-MX">Spanish (Mexico)</option>
                                                 <option value="fr-FR">French</option>
@@ -91,21 +107,37 @@
                                                 <option value="ja-JP">Japanese</option>
                                                 <option value="ko-KR">Korean</option>
                                                 <option value="zh-CN">Chinese (Mandarin)</option>
+                                                <option value="ar-SA">Arabic</option>
+                                                <option value="ta-IN">Tamil</option>
+                                                <option value="te-IN">Telugu</option>
+                                                <option value="bn-IN">Bengali</option>
+                                                <option value="mr-IN">Marathi</option>
                                             </select>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label fw-bold"><i
-                                                    class="fas fa-info-circle me-1"></i>File Requirements</label>
-                                            <div class="form-text">
-                                                <ul class="list-unstyled mb-0">
-                                                    <li><i class="fas fa-check me-1" style="color: var(--success);"></i>
-                                                        Formats: WAV, MP3, M4A</li>
-                                                    <li><i class="fas fa-check me-1" style="color: var(--success);"></i>
-                                                        Max size: 10MB</li>
-                                                    <li><i class="fas fa-check me-1" style="color: var(--success);"></i>
-                                                        Clear audio quality</li>
-                                                </ul>
-                                            </div>
+                                            <label for="outputLanguage" class="form-label fw-bold">
+                                                <i class="fas fa-language me-1"></i>Output Text Language
+                                                <small class="text-muted fw-normal ms-1">(translate result to)</small>
+                                            </label>
+                                            <select id="outputLanguage" class="form-select">
+                                                <option value="">Same as Audio (no translation)</option>
+                                                <option value="en">English</option>
+                                                <option value="hi">Hindi</option>
+                                                <option value="es">Spanish</option>
+                                                <option value="fr">French</option>
+                                                <option value="de">German</option>
+                                                <option value="it">Italian</option>
+                                                <option value="pt">Portuguese</option>
+                                                <option value="ru">Russian</option>
+                                                <option value="ja">Japanese</option>
+                                                <option value="ko">Korean</option>
+                                                <option value="zh-CN">Chinese (Mandarin)</option>
+                                                <option value="ar">Arabic</option>
+                                                <option value="ta">Tamil</option>
+                                                <option value="te">Telugu</option>
+                                                <option value="bn">Bengali</option>
+                                                <option value="mr">Marathi</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="mb-4">
@@ -124,11 +156,18 @@
                                 </form>
                                 <div id="speechResults" class="mt-4" style="display: none;">
                                     <hr>
-                                    <h6 class="fw-bold mb-3"><i class="fas fa-file-alt me-2"></i>Transcription Results
-                                    </h6>
+                                    <h6 class="fw-bold mb-3"><i class="fas fa-file-alt me-2"></i>Transcription Results</h6>
+                                    <div id="translationNotice" class="alert alert-info py-2 mb-3" style="display:none; font-size:0.875rem;">
+                                        <i class="fas fa-language me-1"></i>
+                                        <span id="translationNoticeText"></span>
+                                    </div>
                                     <div class="card" style="background: var(--bg-secondary);">
                                         <div class="card-body">
                                             <div id="transcriptionText" class="mb-3"></div>
+                                            <div id="originalTextSection" style="display:none;" class="mb-3">
+                                                <small class="text-muted"><strong>Original transcription:</strong></small>
+                                                <div id="originalTranscriptionText" class="text-muted mt-1" style="font-size:0.875rem;"></div>
+                                            </div>
                                             <div class="d-flex gap-2">
                                                 <button id="copySpeechResult" class="btn btn-outline-primary btn-sm"><i
                                                         class="fas fa-copy me-1"></i>Copy</button>
@@ -284,16 +323,37 @@
                 const formData = new FormData();
                 const audioFile = document.getElementById('audioFile').files[0];
                 const language = document.getElementById('speechLanguage').value;
+                const outputLanguage = document.getElementById('outputLanguage').value;
                 if (!audioFile) { showError('Please select an audio file.'); return; }
                 if (audioFile.size > 10 * 1024 * 1024) { showError('Audio file size must be less than 10MB.'); return; }
                 formData.append('audio', audioFile);
                 formData.append('language', language);
+                if (outputLanguage) {
+                    formData.append('translate_to', outputLanguage);
+                }
                 showLoading('Converting speech to text...');
                 hideError();
                 try {
                     const response = await fetch('/api/speech-to-text', { method: 'POST', body: formData });
                     const data = await response.json();
-                    if (data.success) { displaySpeechResults(data.text); } else { showError(data.error || 'Speech conversion failed'); }
+                    if (data.success) {
+                        displaySpeechResults(data.text);
+                        // Show translation notice if translation happened
+                        const notice = document.getElementById('translationNotice');
+                        const originalSection = document.getElementById('originalTextSection');
+                        if (data.translated && data.original_text) {
+                            const audioLangLabel = document.getElementById('speechLanguage').selectedOptions[0].text;
+                            const outputLangLabel = document.getElementById('outputLanguage').selectedOptions[0].text;
+                            document.getElementById('translationNoticeText').textContent =
+                                `Transcribed from ${audioLangLabel}, then translated to ${outputLangLabel}.`;
+                            notice.style.display = 'block';
+                            document.getElementById('originalTranscriptionText').textContent = data.original_text;
+                            originalSection.style.display = 'block';
+                        } else {
+                            notice.style.display = 'none';
+                            originalSection.style.display = 'none';
+                        }
+                    } else { showError(data.error || 'Speech conversion failed'); }
                 } catch (error) { showError('Network error. Please try again.'); }
                 hideLoading();
             });

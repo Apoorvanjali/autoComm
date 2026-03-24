@@ -10,7 +10,7 @@ This application provides AI-powered text processing features including:
 - Intelligent Email Automation
 """
 
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify, send_file, send_from_directory, redirect, url_for, flash, session
 import os
 import tempfile
 from services.summarizer import TextSummarizer
@@ -30,6 +30,76 @@ translator = LanguageTranslator()
 speech_to_text = SpeechToTextConverter()
 text_to_speech = TextToSpeechConverter()
 email_service = EmailService()
+
+# ---------------------------------------------------------------------------
+# Auth Routes
+# ---------------------------------------------------------------------------
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """
+    Login page
+    """
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
+        remember = request.form.get('remember_me')
+
+        # Demo authentication — replace with real DB lookup
+        if email and password:
+            # Accept any non-empty credentials for demo; swap with real check
+            session['user_email'] = email
+            session['logged_in'] = True
+            flash('Welcome back! You are now signed in.', 'success')
+            return redirect(url_for('index'))
+        else:
+            flash('Please enter your email and password.', 'error')
+
+    return render_template('login.html')
+
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    """
+    Sign-up / registration page
+    """
+    if request.method == 'POST':
+        first_name = request.form.get('first_name', '').strip()
+        last_name = request.form.get('last_name', '').strip()
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
+        confirm_password = request.form.get('confirm_password', '')
+
+        if not first_name or not email or not password or not confirm_password:
+            flash('Please fill in all required fields.', 'error')
+        elif password != confirm_password:
+            flash('Passwords do not match. Please try again.', 'error')
+        elif len(password) < 8:
+            flash('Password must be at least 8 characters long.', 'error')
+        else:
+            # Account creation — replace with real DB save
+            session['user_email'] = email
+            session['user_name'] = first_name
+            session['logged_in'] = True
+            flash(f'Account created successfully! Welcome, {first_name}!', 'success')
+            return redirect(url_for('index'))
+
+    return render_template('signup.html')
+
+
+@app.route('/logout')
+def logout():
+    """
+    Log out the current user
+    """
+    session.clear()
+    flash('You have been signed out.', 'success')
+    return redirect(url_for('login'))
+
+
+# ---------------------------------------------------------------------------
+# Page Routes
+# ---------------------------------------------------------------------------
 
 @app.route('/')
 def index():
@@ -128,34 +198,74 @@ def api_translate():
 @app.route('/api/speech-to-text', methods=['POST'])
 def api_speech_to_text():
     """
-    API endpoint for speech-to-text conversion
+    API endpoint for speech-to-text conversion.
+    Accepts:
+      - audio (file): the audio file
+      - language (str): BCP-47 code for recognition, e.g. 'en-US' (default)
+      - translate_to (str): ISO-639-1 code to translate the transcript into, e.g. 'hi'
     """
+    temp_path = None
     try:
         if 'audio' not in request.files:
             return jsonify({'error': 'Audio file is required'}), 400
-        
+
         audio_file = request.files['audio']
-        
+
         if audio_file.filename == '':
             return jsonify({'error': 'No audio file selected'}), 400
-        
-        # Save uploaded file temporarily
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_file:
-            audio_file.save(temp_file.name)
-            
-            # Convert speech to text
-            text = speech_to_text.convert_audio_to_text(temp_file.name)
-            
-            # Clean up temporary file
-            os.unlink(temp_file.name)
-            
-            return jsonify({
-                'success': True,
-                'text': text
-            })
-            
+
+        # Recognition language from form (BCP-47, e.g. 'hi-IN', 'en-US')
+        language = request.form.get('language', 'en-US')
+
+        # Optional translation target (ISO-639-1, e.g. 'hi', 'fr')
+        translate_to = request.form.get('translate_to', '').strip()
+
+        # Preserve original file extension so pydub can identify the format
+        original_ext = os.path.splitext(audio_file.filename)[1] or '.wav'
+
+        # Save uploaded file to a temporary path
+        with tempfile.NamedTemporaryFile(delete=False, suffix=original_ext) as temp_file:
+            temp_path = temp_file.name
+
+        audio_file.save(temp_path)
+
+        # Step 1: Transcribe in the chosen recognition language
+        text = speech_to_text.convert_audio_to_text(temp_path, language=language)
+
+        # Step 2: Translate if a different output language was requested
+        translated_text = None
+        if translate_to:
+            # Derive a simple 2-letter base from BCP-47 (e.g. 'hi-IN' -> 'hi')
+            recognition_base = language.split('-')[0].lower()
+            target_base = translate_to.split('-')[0].lower()
+
+            # Only translate if target differs from recognition language
+            if recognition_base != target_base:
+                try:
+                    translated_text = translator.translate(
+                        text, source_lang='auto', target_lang=target_base
+                    )
+                except Exception as te:
+                    print(f"⚠️ Translation after transcription failed: {te}")
+
+        return jsonify({
+            'success': True,
+            'text': translated_text if translated_text else text,
+            'original_text': text if translated_text else None,
+            'translated': bool(translated_text),
+            'recognition_language': language,
+            'output_language': translate_to or language,
+        })
+
     except Exception as e:
         return jsonify({'error': f'Speech-to-text conversion failed: {str(e)}'}), 500
+    finally:
+        # Always clean up the temp file
+        if temp_path and os.path.exists(temp_path):
+            try:
+                os.unlink(temp_path)
+            except Exception:
+                pass
 
 @app.route('/api/text-to-speech', methods=['POST'])
 def api_text_to_speech():
@@ -220,6 +330,32 @@ def api_send_email():
             
     except Exception as e:
         return jsonify({'error': f'Email sending failed: {str(e)}'}), 500
+
+@app.route('/favicon.ico')
+def favicon():
+    """
+    Serve favicon to prevent 404 errors in browser console
+    """
+    return send_from_directory(
+        os.path.join(app.root_path, 'static'),
+        'favicon.svg',
+        mimetype='image/svg+xml'
+    )
+
+@app.route('/api/detect-language', methods=['POST'])
+def api_detect_language():
+    """
+    API endpoint for language detection
+    """
+    try:
+        data = request.get_json()
+        text = data.get('text', '').strip()
+        if not text:
+            return jsonify({'error': 'Text is required'}), 400
+        detected = translator.detect_language(text)
+        return jsonify({'success': True, 'language': detected})
+    except Exception as e:
+        return jsonify({'error': f'Language detection failed: {str(e)}'}), 500
 
 @app.errorhandler(404)
 def not_found(error):

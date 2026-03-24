@@ -13,6 +13,7 @@ huggingface-hub>=0.16.0
 
 # Translation Services
 sentencepiece>=0.1.95
+deep-translator>=1.11.0
 
 # Speech Processing
 SpeechRecognition>=3.10.0
