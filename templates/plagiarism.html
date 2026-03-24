@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plagiarism Detection - AutoComm</title>
+    <meta name="description"
+        content="Advanced plagiarism detection tool. Check for content plagiarism in documents, PDFs, Word files, PowerPoint presentations, and text.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+
+    <style>
+        .plagiarism-score-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .score-circle {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-right: 2rem;
+        }
+
+        .score-circle.low {
+            background: rgba(16, 185, 129, 0.1);
+            border: 3px solid var(--success);
+            color: var(--success);
+        }
+
+        .score-circle.medium {
+            background: rgba(245, 158, 11, 0.1);
+            border: 3px solid var(--warning);
+            color: var(--warning);
+        }
+
+        .score-circle.high {
+            background: rgba(239, 68, 68, 0.1);
+            border: 3px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .score-info h4 {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .tabs-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab-btn {
+            padding: 1rem 1.5rem;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .file-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--bg-secondary);
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary);
+            background: var(--bg-hover);
+        }
+
+        .file-upload-area.dragover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .detection-results {
+            margin-top: 2rem;
+        }
+
+        .result-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .pattern-badge {
+            display: inline-block;
+            background: var(--warning-light);
+            color: var(--warning);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .similarity-item {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 0.5rem;
+            border-left: 4px solid var(--info);
+        }
+
+        .recommendation-box {
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            margin-top: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .recommendation-box.success {
+            background: var(--success-light);
+            border-left-color: var(--success);
+            color: var(--success);
+        }
+
+        .recommendation-box.warning {
+            background: var(--warning-light);
+            border-left-color: var(--warning);
+            color: var(--warning);
+        }
+
+        .recommendation-box.danger {
+            background: var(--danger-light);
+            border-left-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+        }
+
+        .stat-label {
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .result-card,
+        .result-card h6,
+        .similarity-item,
+        .score-info,
+        .file-upload-area,
+        .card-header,
+        .card-body,
+        .tab-content,
+        .tab-content label,
+        .tab-content small,
+        .tab-content p {
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .text-muted {
+            color: var(--text-secondary) !important;
+        }
+
+        [data-theme="dark"] .alert-info {
+            background: rgba(59, 130, 246, 0.12);
+            border-color: rgba(59, 130, 246, 0.35);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .alert-info strong,
+        [data-theme="dark"] .alert-info span,
+        [data-theme="dark"] .alert-info i {
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-bolt"></i>AutoComm
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/summarizer">Summarizer</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/translator">Translator</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/speech">Speech</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/email">Email</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/plagiarism">Plagiarism</a>
+                    </li>
+                    {% if session.get('logged_in') %}
+                    <li class="nav-item ms-2">
+                        <a href="/logout" class="btn btn-outline-primary btn-sm" style="padding:0.5rem 1.125rem;">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item ms-2">
+                        <a class="nav-link" href="/login" style="font-weight:600;">Sign In</a>
+                    </li>
+                    <li class="nav-item ms-1">
+                        <a href="/signup" class="btn btn-primary btn-sm" style="padding:0.5rem 1.125rem;">
+                            <i class="fas fa-user-plus me-1"></i>Get Started
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="mb-4">
+                    <div class="hero-badge mb-3">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Advanced Content Verification</span>
+                    </div>
+                    <h1 class="display-4 fw-bold mb-3">
+                        Plagiarism <span class="text-gradient">Detector</span>
+                    </h1>
+                    <p class="lead" style="color: var(--text-secondary); max-width: 700px;">
+                        Detect plagiarized content with advanced AI analysis. Upload documents or paste text to check originality.
+                        Supports PDF, Word, PowerPoint, and plain text files.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mb-5">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <!-- Tab Navigation -->
+                <div class="tabs-container">
+                    <button class="tab-btn active" onclick="switchTab('text')">
+                        <i class="fas fa-file-alt me-2"></i>Paste Text
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('file')">
+                        <i class="fas fa-upload me-2"></i>Upload File
+                    </button>
+                </div>
+
+                <!-- Text Input Tab -->
+                <div class="tab-content active" id="text-tab">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-keyboard me-2"></i>Enter Text for Plagiarism Check
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="textForm">
+                                <!-- Text Input -->
+                                <div class="mb-3">
+                                    <label for="inputText" class="form-label">
+                                        <i class="fas fa-file-alt me-1"></i>Paste your content here
+                                    </label>
+                                    <textarea id="inputText" class="form-control" rows="10"
+                                        placeholder="Paste the text you want to check for plagiarism..."
+                                        required minlength="20"></textarea>
+                                    <small class="text-muted d-block mt-2">
+                                        Minimum 20 characters required. Maximum 50,000 characters.
+                                    </small>
+                                </div>
+
+                                <!-- Check Mode -->
+                                <div class="mb-3">
+                                    <label for="checkMode" class="form-label">
+                                        <i class="fas fa-sliders-h me-1"></i>Analysis Mode
+                                    </label>
+                                    <select id="checkMode" class="form-select">
+                                        <option value="fast">Fast (Quick basic check)</option>
+                                        <option value="advanced" selected>Advanced (Detailed analysis)</option>
+                                        <option value="comprehensive">Comprehensive (Full deep scan)</option>
+                                    </select>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    <i class="fas fa-search me-2"></i>
+                                    Check for Plagiarism
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- File Upload Tab -->
+                <div class="tab-content" id="file-tab">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-cloud-upload-alt me-2"></i>Upload Document
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="fileForm" enctype="multipart/form-data">
+                                <!-- File Upload Area -->
+                                <div class="file-upload-area" id="dropZone">
+                                    <div>
+                                        <i class="fas fa-file-upload" style="font-size: 3rem; color: var(--primary);"></i>
+                                        <h5 class="mt-3">Drop file here or click to browse</h5>
+                                        <p style="color: var(--text-secondary);">
+                                            Supported formats: PDF, Word (.docx), PowerPoint (.pptx), Text (.txt)
+                                        </p>
+                                        <p style="font-size: 0.875rem; color: var(--text-muted);">
+                                            Maximum file size: 16MB
+                                        </p>
+                                    </div>
+                                    <input type="file" id="fileInput" hidden accept=".pdf,.docx,.pptx,.txt"
+                                        required>
+                                </div>
+
+                                <!-- Selected File Display -->
+                                <div id="selectedFileInfo" style="display: none; margin-top: 1rem;">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        <strong>File Selected:</strong> <span id="fileName"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Check Mode -->
+                                <div class="mb-3" style="margin-top: 1.5rem;">
+                                    <label for="fileCheckMode" class="form-label">
+                                        <i class="fas fa-sliders-h me-1"></i>Analysis Mode
+                                    </label>
+                                    <select id="fileCheckMode" class="form-select">
+                                        <option value="fast">Fast (Quick basic check)</option>
+                                        <option value="advanced" selected>Advanced (Detailed analysis)</option>
+                                        <option value="comprehensive">Comprehensive (Full deep scan)</option>
+                                    </select>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    <i class="fas fa-search me-2"></i>
+                                    Check Document for Plagiarism
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div class="detection-results" id="resultsSection" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-pie me-2"></i>Plagiarism Analysis Report
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Plagiarism Score Display -->
+                            <div class="plagiarism-score-display">
+                                <div class="score-circle" id="scoreCircle">
+                                    <span id="scoreValue">0</span>%
+                                </div>
+                                <div class="score-info">
+                                    <h4 id="scoreLabel">Analyzing...</h4>
+                                    <p id="scoreDescription" style="margin: 0; color: var(--text-secondary);">
+                                        Please wait for analysis to complete
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Statistics -->
+                            <div class="result-card">
+                                <h6 class="mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>Content Statistics
+                                </h6>
+                                <div class="stat-row">
+                                    <span class="stat-label">Total Words:</span>
+                                    <span class="stat-value" id="wordCount">-</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">Original Length:</span>
+                                    <span class="stat-value" id="contentLength">-</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">Status:</span>
+                                    <span class="stat-value" id="analysisStatus">-</span>
+                                </div>
+                            </div>
+
+                            <!-- Suspicious Patterns -->
+                            <div class="result-card" id="patternsSection" style="display: none;">
+                                <h6 class="mb-3">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Suspicious Patterns Detected
+                                </h6>
+                                <div id="patternsList"></div>
+                            </div>
+
+                            <!-- Recommendation -->
+                            <div id="recommendationBox" class="recommendation-box" style="display: none;">
+                                <h6 class="mb-2">
+                                    <i class="fas fa-lightbulb me-2"></i>Recommendation
+                                </h6>
+                                <p class="mb-0" id="recommendationText"></p>
+                            </div>
+
+                            <!-- Similar Content -->
+                            <div class="result-card" id="similaritySection" style="display: none;">
+                                <h6 class="mb-3">
+                                    <i class="fas fa-clone me-2"></i>Similar Content Segments
+                                </h6>
+                                <div id="similarityList"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-2 mt-3">
+                        <button class="btn btn-outline-primary flex-grow-1" onclick="downloadReport()">
+                            <i class="fas fa-download me-2"></i>Download Report
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="resetForm()">
+                            <i class="fas fa-redo me-2"></i>New Check
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div id="loadingState" style="display: none; text-align: center; padding: 3rem 0;">
+                    <div class="spinner-border mb-3" style="color: var(--primary);" role="status">
+                        <span class="visually-hidden">Checking...</span>
+                    </div>
+                    <h5>Analyzing content for plagiarism...</h5>
+                    <p style="color: var(--text-secondary);">
+                        This may take a few moments depending on content length and analysis mode
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tab + '-tab').classList.add('active');
+            event.target.closest('.tab-btn').classList.add('active');
+        }
+
+        // File upload handling
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        if (dropZone) {
+            dropZone.addEventListener('click', () => fileInput.click());
+
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('dragover');
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                handleFileSelect(e.dataTransfer.files);
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                handleFileSelect(e.target.files);
+            });
+        }
+
+        function handleFileSelect(files) {
+            if (files.length > 0) {
+                const file = files[0];
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('selectedFileInfo').style.display = 'block';
+            }
+        }
+
+        // Form submissions
+        if (document.getElementById('textForm')) {
+            document.getElementById('textForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const text = document.getElementById('inputText').value;
+                const mode = document.getElementById('checkMode').value;
+                await checkPlagiarismText(text, mode);
+            });
+        }
+
+        if (document.getElementById('fileForm')) {
+            document.getElementById('fileForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const file = document.getElementById('fileInput').files[0];
+                const mode = document.getElementById('fileCheckMode').value;
+                if (file) {
+                    await checkPlagiarismFile(file, mode);
+                }
+            });
+        }
+
+        async function checkPlagiarismText(text, mode) {
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('resultsSection').style.display = 'none';
+
+            try {
+                const response = await fetch('/api/check-plagiarism-text', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, check_mode: mode })
+                });
+
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                document.getElementById('loadingState').style.display = 'none';
+            }
+        }
+
+        async function checkPlagiarismFile(file, mode) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('check_mode', mode);
+
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('resultsSection').style.display = 'none';
+
+            try {
+                const response = await fetch('/api/check-plagiarism-file', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                document.getElementById('loadingState').style.display = 'none';
+            }
+        }
+
+        function displayResults(data) {
+            if (!data.success) {
+                alert('Error: ' + (data.error || 'Unknown error occurred'));
+                return;
+            }
+
+            document.getElementById('resultsSection').style.display = 'block';
+
+            const score = Math.round(data.plagiarism_score || 0);
+            document.getElementById('scoreValue').textContent = score;
+
+            // Determine color class
+            let scoreClass = 'low';
+            if (score >= 50) scoreClass = 'high';
+            else if (score >= 30) scoreClass = 'medium';
+
+            document.getElementById('scoreCircle').className = `score-circle ${scoreClass}`;
+
+            // Set labels and description
+            if (score < 15) {
+                document.getElementById('scoreLabel').textContent = '✅ Low Risk';
+                document.getElementById('scoreDescription').textContent = 'Content appears to be original';
+            } else if (score < 30) {
+                document.getElementById('scoreLabel').textContent = '⚠️ Moderate Risk';
+                document.getElementById('scoreDescription').textContent = 'Some similarity detected';
+            } else if (score < 50) {
+                document.getElementById('scoreLabel').textContent = '⚠️⚠️ High Risk';
+                document.getElementById('scoreDescription').textContent = 'Significant plagiarism detected';
+            } else {
+                document.getElementById('scoreLabel').textContent = '🚨 Very High Risk';
+                document.getElementById('scoreDescription').textContent = 'Likely plagiarized content';
+            }
+
+            // Update statistics
+            document.getElementById('wordCount').textContent = (data.words_count || 0).toLocaleString();
+            document.getElementById('contentLength').textContent = (data.original_length || 0).toLocaleString() + ' characters';
+            document.getElementById('analysisStatus').textContent = data.status || 'Analyzed';
+
+            // Show patterns
+            if (data.suspicious_patterns && data.suspicious_patterns.length > 0) {
+                document.getElementById('patternsSection').style.display = 'block';
+                const patternsList = document.getElementById('patternsList');
+                patternsList.innerHTML = data.suspicious_patterns
+                    .map(p => `<span class="pattern-badge">${p}</span>`)
+                    .join('');
+            }
+
+            // Show recommendation
+            if (data.recommendation) {
+                document.getElementById('recommendationBox').style.display = 'block';
+                let recClass = 'success';
+                if (score >= 50) recClass = 'danger';
+                else if (score >= 30) recClass = 'warning';
+                document.getElementById('recommendationBox').className = `recommendation-box ${recClass}`;
+                document.getElementById('recommendationText').textContent = data.recommendation;
+            }
+
+            // Show similar content
+            if (data.similarities && data.similarities.length > 0) {
+                document.getElementById('similaritySection').style.display = 'block';
+                const similarityList = document.getElementById('similarityList');
+                similarityList.innerHTML = data.similarities
+                    .map(s => `<div class="similarity-item"><small>${s.segment}</small></div>`)
+                    .join('');
+            }
+
+            // Scroll to results
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function downloadReport() {
+            const score = document.getElementById('scoreValue').textContent;
+            const wordCount = document.getElementById('wordCount').textContent;
+            const report = `Plagiarism Detection Report\n` +
+                `================================\n\n` +
+                `Plagiarism Score: ${score}%\n` +
+                `Word Count: ${wordCount}\n` +
+                `Analysis Status: ${document.getElementById('analysisStatus').textContent}\n` +
+                `Recommendation: ${document.getElementById('recommendationText').textContent}\n`;
+
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(report));
+            element.setAttribute('download', 'plagiarism_report.txt');
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+
+        function resetForm() {
+            document.getElementById('textForm').reset();
+            document.getElementById('fileForm').reset();
+            document.getElementById('fileInput').value = '';
+            document.getElementById('selectedFileInfo').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('loadingState').style.display = 'none';
+        }
+    </script>
+</body>
+
+</html>

@@ -8,6 +8,7 @@ This application provides AI-powered text processing features including:
 - Speech-to-Text conversion
 - Text-to-Speech conversion
 - Intelligent Email Automation
+- Plagiarism Detection
 """
 
 from flask import Flask, render_template, request, jsonify, send_file, send_from_directory, redirect, url_for, flash, session
@@ -18,6 +19,8 @@ from services.translator import LanguageTranslator
 from services.speech_to_text import SpeechToTextConverter
 from services.text_to_speech import TextToSpeechConverter
 from services.email_service import EmailService
+from services.plagiarism_checker import PlagiarismChecker
+from services.workflow_automation import WorkflowAutomationService
 
 # Initialize Flask application
 app = Flask(__name__)
@@ -30,6 +33,14 @@ translator = LanguageTranslator()
 speech_to_text = SpeechToTextConverter()
 text_to_speech = TextToSpeechConverter()
 email_service = EmailService()
+plagiarism_checker = PlagiarismChecker()
+workflow_automation = WorkflowAutomationService(
+    summarizer=summarizer,
+    translator=translator,
+    text_to_speech=text_to_speech,
+    email_service=email_service,
+    plagiarism_checker=plagiarism_checker,
+)
 
 # ---------------------------------------------------------------------------
 # Auth Routes
@@ -135,6 +146,23 @@ def email_page():
     Email automation page
     """
     return render_template('email.html')
+
+@app.route('/plagiarism')
+def plagiarism_page():
+    """
+    Plagiarism detection and content verification page
+    """
+    return render_template('plagiarism.html')
+
+@app.route('/automation')
+def automation_page():
+    """
+    End-to-end automation page
+    """
+    supported_languages = translator.get_supported_languages()
+    # Normalize to a stable list of (code, name) for template rendering
+    language_options = sorted(supported_languages.items(), key=lambda x: x[1])
+    return render_template('automation.html', language_options=language_options)
 
 # API Routes for AI Services
 
@@ -330,6 +358,155 @@ def api_send_email():
             
     except Exception as e:
         return jsonify({'error': f'Email sending failed: {str(e)}'}), 500
+
+@app.route('/api/check-plagiarism-text', methods=['POST'])
+def api_check_plagiarism_text():
+    """
+    API endpoint for plagiarism detection from plain text
+    """
+    try:
+        data = request.get_json()
+        text = data.get('text', '').strip()
+        check_mode = data.get('check_mode', 'advanced')
+        
+        if not text:
+            return jsonify({'error': 'Text is required'}), 400
+        
+        if len(text.split()) < 10:
+            return jsonify({
+                'error': 'Text must contain at least 10 words',
+                'plagiarism_score': 0,
+                'status': 'insufficient_text'
+            }), 400
+        
+        # Check plagiarism
+        report = plagiarism_checker.check_text_plagiarism(text, check_mode=check_mode)
+        
+        return jsonify(report)
+        
+    except Exception as e:
+        return jsonify({'error': f'Plagiarism check failed: {str(e)}'}), 500
+
+@app.route('/api/check-plagiarism-file', methods=['POST'])
+def api_check_plagiarism_file():
+    """
+    API endpoint for plagiarism detection from uploaded files (PDF, Word, PowerPoint, Text)
+    """
+    temp_path = None
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'File is required'}), 400
+
+        file = request.files['file']
+        
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+
+        check_mode = request.form.get('check_mode', 'advanced')
+        
+        # Validate file extension
+        allowed_extensions = {'.pdf', '.docx', '.pptx', '.txt', '.text', '.doc'}
+        file_ext = os.path.splitext(file.filename)[1].lower()
+        
+        if file_ext not in allowed_extensions:
+            return jsonify({
+                'error': f'Unsupported file format. Allowed: PDF, Word (.docx), PowerPoint (.pptx), Text (.txt)'
+            }), 400
+
+        # Save uploaded file temporarily
+        with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as temp_file:
+            temp_path = temp_file.name
+        
+        file.save(temp_path)
+
+        # Check plagiarism
+        report = plagiarism_checker.check_file_plagiarism(temp_path, check_mode=check_mode)
+        
+        return jsonify(report)
+        
+    except Exception as e:
+        return jsonify({'error': f'File plagiarism check failed: {str(e)}'}), 500
+    finally:
+        # Clean up temporary file
+        if temp_path and os.path.exists(temp_path):
+            try:
+                os.unlink(temp_path)
+            except Exception:
+                pass
+
+@app.route('/api/automation-workflow', methods=['POST'])
+def api_automation_workflow():
+    """
+    API endpoint for end-to-end workflow automation:
+    text/file -> summarize -> translate -> speech -> email
+    """
+    temp_path = None
+    try:
+        input_mode = request.form.get('input_mode', 'text').strip().lower()
+        input_text = request.form.get('text', '').strip()
+
+        sender_email = request.form.get('sender_email', '').strip()
+        sender_password = request.form.get('sender_password', '').strip()
+        receiver_email = request.form.get('receiver_email', '').strip()
+        subject = request.form.get('subject', 'Automated AI Content').strip() or 'Automated AI Content'
+
+        summary_length = request.form.get('summary_length', 'medium').strip()
+        summary_style = request.form.get('summary_style', 'paragraph').strip()
+        target_language = request.form.get('target_language', 'en').strip()
+
+        run_plagiarism = request.form.get('run_plagiarism', 'false').strip().lower() in ('1', 'true', 'yes', 'on')
+        plagiarism_mode = request.form.get('plagiarism_mode', 'advanced').strip()
+
+        file_path = None
+        if input_mode == 'file':
+            if 'file' not in request.files:
+                return jsonify({'success': False, 'error': 'File is required for file mode'}), 400
+
+            uploaded = request.files['file']
+            if uploaded.filename == '':
+                return jsonify({'success': False, 'error': 'No file selected'}), 400
+
+            allowed_extensions = {'.pdf', '.docx', '.pptx', '.txt', '.text'}
+            file_ext = os.path.splitext(uploaded.filename)[1].lower()
+            if file_ext not in allowed_extensions:
+                return jsonify({'success': False, 'error': 'Unsupported file format. Allowed: PDF, DOCX, PPTX, TXT'}), 400
+
+            with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as temp_file:
+                temp_path = temp_file.name
+
+            uploaded.save(temp_path)
+            file_path = temp_path
+        else:
+            if not input_text:
+                return jsonify({'success': False, 'error': 'Text is required in text mode'}), 400
+
+        result = workflow_automation.run_workflow(
+            input_text=input_text,
+            file_path=file_path,
+            summary_length=summary_length,
+            summary_style=summary_style,
+            target_language=target_language,
+            sender_email=sender_email,
+            sender_password=sender_password,
+            receiver_email=receiver_email,
+            subject=subject,
+            run_plagiarism=run_plagiarism,
+            plagiarism_mode=plagiarism_mode,
+        )
+
+        if result.get('success'):
+            return jsonify(result)
+
+        return jsonify(result), 500
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': f'Automation workflow failed: {str(e)}'}), 500
+    finally:
+        if temp_path and os.path.exists(temp_path):
+            try:
+                os.unlink(temp_path)
+            except Exception:
+                pass
 
 @app.route('/favicon.ico')
 def favicon():

@@ -15,6 +15,9 @@ except ImportError:
     GTTS_AVAILABLE = False
     print("❌ gTTS not installed. Run: pip install gTTS")
 
+# Import the translator for language conversion
+from .translator import LanguageTranslator
+
 # Supported language codes for gTTS
 GTTS_SUPPORTED_LANGS = None  # lazy-loaded
 
@@ -53,19 +56,26 @@ class TextToSpeechConverter:
             print("✅ Text-to-Speech Converter initialized (Google TTS)")
         else:
             print("❌ gTTS not available - text-to-speech will not work")
+        
+        # Initialize translator for language conversion
+        self.translator = LanguageTranslator()
 
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
 
-    def convert_text_to_speech(self, text, language='en', slow=False):
+    def convert_text_to_speech(self, text, language='en', slow=False, translate_before_tts=True):
         """
         Convert text to an MP3 audio file.
+        
+        The text is automatically translated to the target language before speech generation.
 
         Args:
             text (str): Text to synthesize (any language, up to 5000 chars)
             language (str): BCP-47 or ISO 639-1 language code (e.g. 'hi', 'zh-CN', 'fr')
+                           Text will be translated to this language before speech generation
             slow (bool): If True, speak slowly
+            translate_before_tts (bool): If True, translate text to target language first
 
         Returns:
             str: Path to generated MP3 file
@@ -82,11 +92,26 @@ class TextToSpeechConverter:
             text = text[:MAX_CHARS]
             print(f"⚠️ Text truncated to {MAX_CHARS} characters for TTS")
 
+        translated_text = text
+        if translate_before_tts:
+            # Step 1: Translate the text to the target language
+            # Map language code to standard ISO 639-1 for translation
+            target_lang_code = self._get_iso_lang_code(language)
+
+            print(f"🌍 Translating text to '{language}' ({target_lang_code})...")
+            try:
+                translated_text = self.translator.translate(text, source_lang='auto', target_lang=target_lang_code)
+                print(f"✅ Translation complete. Translated text: {translated_text[:100]}...")
+            except Exception as e:
+                print(f"⚠️ Translation failed: {e}. Using original text.")
+                translated_text = text
+
+        # Step 2: Resolve the language code for TTS
         resolved = self._resolve_lang(language)
         print(f"🌐 Using language code: '{resolved}' (requested: '{language}')")
 
         try:
-            tts = gTTS(text=text, lang=resolved, slow=slow)
+            tts = gTTS(text=translated_text, lang=resolved, slow=slow)
             temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.mp3')
             temp_file.close()
             tts.save(temp_file.name)
@@ -98,7 +123,7 @@ class TextToSpeechConverter:
             if resolved != 'en':
                 print("⚠️ Retrying with English...")
                 try:
-                    tts = gTTS(text=text, lang='en', slow=slow)
+                    tts = gTTS(text=translated_text, lang='en', slow=slow)
                     temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.mp3')
                     temp_file.close()
                     tts.save(temp_file.name)
@@ -107,9 +132,11 @@ class TextToSpeechConverter:
                     print(f"❌ English fallback also failed: {e2}")
             raise RuntimeError(f"Text-to-speech conversion failed: {str(e)}")
 
-    def convert_text_to_speech_bytes(self, text, language='en', slow=False):
+    def convert_text_to_speech_bytes(self, text, language='en', slow=False, translate_before_tts=True):
         """
         Convert text to speech and return raw MP3 bytes (for streaming).
+        
+        The text is automatically translated to the target language before speech generation.
 
         Returns:
             bytes: MP3 audio data, or None on failure
@@ -122,10 +149,24 @@ class TextToSpeechConverter:
             if not text:
                 return None
 
+            translated_text = text
+            if translate_before_tts:
+                # Step 1: Translate the text to the target language
+                target_lang_code = self._get_iso_lang_code(language)
+
+                print(f"🌍 Translating text to '{language}' ({target_lang_code})...")
+                try:
+                    translated_text = self.translator.translate(text, source_lang='auto', target_lang=target_lang_code)
+                    print(f"✅ Translation complete.")
+                except Exception as e:
+                    print(f"⚠️ Translation failed: {e}. Using original text.")
+                    translated_text = text
+
+            # Step 2: Resolve the language code for TTS
             resolved = self._resolve_lang(language)
             print(f"🌐 Using language code: '{resolved}' (requested: '{language}')")
 
-            tts = gTTS(text=text[:5000], lang=resolved, slow=slow)
+            tts = gTTS(text=translated_text[:5000], lang=resolved, slow=slow)
             buf = BytesIO()
             tts.write_to_fp(buf)
             buf.seek(0)
@@ -155,6 +196,22 @@ class TextToSpeechConverter:
     # ------------------------------------------------------------------
     # Helpers
     # ------------------------------------------------------------------
+
+    def _get_iso_lang_code(self, language):
+        """
+        Convert language code to ISO 639-1 format for the translator.
+        
+        Examples:
+            'zh-CN' -> 'zh'
+            'en' -> 'en'
+            'pt-BR' -> 'pt'
+        """
+        if not language:
+            return 'en'
+        
+        # Extract base language code (first part before hyphen)
+        base = language.lower().split('-')[0].strip()
+        return base if base else 'en'
 
     def _resolve_lang(self, language):
         """

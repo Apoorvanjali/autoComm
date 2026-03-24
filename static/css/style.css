@@ -845,6 +845,35 @@ textarea.form-control {
 }
 
 /* ============================================
+   Dark Mode Readability Overrides
+   ============================================ */
+
+[data-theme="dark"] .text-body,
+[data-theme="dark"] .text-body-emphasis,
+[data-theme="dark"] .text-dark,
+[data-theme="dark"] .text-black {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .card,
+[data-theme="dark"] .card-header,
+[data-theme="dark"] .card-body,
+[data-theme="dark"] .list-group-item,
+[data-theme="dark"] .form-check-label,
+[data-theme="dark"] .input-group-text {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .alert-info,
+[data-theme="dark"] .alert-light {
+    color: var(--text-primary);
+}
+
+/* ============================================
    Loading States
    ============================================ */
 
@@ -954,6 +983,7 @@ textarea.form-control {
     line-height: 1.8;
     white-space: pre-wrap;
     font-size: 1.0625rem;
+    color: var(--text-primary);
 }
 
 .translation-output,
@@ -963,6 +993,7 @@ textarea.form-control {
     border-radius: var(--radius-lg);
     padding: 1.5rem;
     min-height: 200px;
+    color: var(--text-primary);
 }
 
 /* ============================================

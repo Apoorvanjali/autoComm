@@ -38,26 +38,39 @@ class TextSummarizer:
         to TF-IDF-style extractive summarizer.
         """
         self.summarizer = None
+        self._model_init_attempted = False
 
+        # Do not download/load heavy models at app startup. We initialize
+        # transformer pipelines lazily on the first summarize request.
         if TRANSFORMERS_AVAILABLE:
-            # Try facebook/bart-large-cnn (best), then distilbart (faster)
-            for model_name in [
-                "sshleifer/distilbart-cnn-12-6",
-                "facebook/bart-large-cnn",
-            ]:
-                try:
-                    self.summarizer = pipeline(
-                        "summarization",
-                        model=model_name,
-                        tokenizer=model_name,
-                    )
-                    print(f"✅ Text Summarizer initialized with model: {model_name}")
-                    break
-                except Exception as e:
-                    print(f"⚠️  Model {model_name} unavailable: {e}")
-
-        if self.summarizer is None:
+            print("✅ Text Summarizer ready (transformer model will load on first use)")
+        else:
             print("✅ Text Summarizer initialized with extractive fallback")
+
+    def _ensure_model(self):
+        """Initialize transformer model once, on demand."""
+        if self._model_init_attempted or not TRANSFORMERS_AVAILABLE:
+            return
+
+        self._model_init_attempted = True
+
+        # Prefer a lighter DistilBART model first, then a higher-quality fallback.
+        for model_name in [
+            "sshleifer/distilbart-cnn-6-6",
+            "facebook/bart-large-cnn",
+        ]:
+            try:
+                self.summarizer = pipeline(
+                    "summarization",
+                    model=model_name,
+                    tokenizer=model_name,
+                )
+                print(f"✅ Text Summarizer initialized with model: {model_name}")
+                return
+            except Exception as e:
+                print(f"⚠️  Model {model_name} unavailable: {e}")
+
+        print("✅ Falling back to extractive summarization (no transformer model loaded)")
 
     # ------------------------------------------------------------------
     # Public API
@@ -81,6 +94,9 @@ class TextSummarizer:
             return text  # Too short to summarize
 
         try:
+            if self.summarizer is None and TRANSFORMERS_AVAILABLE:
+                self._ensure_model()
+
             if self.summarizer:
                 summary = self._abstractive_summarize(text, length)
             else:
