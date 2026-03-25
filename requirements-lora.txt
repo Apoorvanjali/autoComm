@@ -1,0 +1,8 @@
+# LoRA Fine-Tuning Dependencies
+# Install with: pip install -r requirements-lora.txt
+
+transformers>=4.30.0
+datasets>=2.11.0
+peft>=0.4.0
+accelerate>=0.20.0
+torch>=2.0.0
