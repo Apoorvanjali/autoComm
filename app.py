@@ -256,6 +256,64 @@ def api_summarize():
                 pass
 
 
+@app.route('/api/translate', methods=['POST'])
+def api_translate():
+    """
+    API endpoint for language translation
+    """
+    try:
+        data = request.get_json()
+        text = data.get('text', '').strip()
+        source_lang = data.get('source_language', 'auto')
+        target_lang = data.get('target_language', 'en')
+
+        if not text:
+            return jsonify({'error': 'Text is required'}), 400
+
+        # Translate text using AI service
+        translation = translator.translate(text, source_lang, target_lang)
+
+        return jsonify({
+            'success': True,
+            'translation': translation,
+            'source_language': source_lang,
+            'target_language': target_lang
+        })
+
+    except Exception as e:
+        return jsonify({'error': f'Translation failed: {str(e)}'}), 500
+
+
+@app.route('/api/speech-to-text', methods=['POST'])
+def api_speech_to_text():
+    """
+    API endpoint for speech-to-text conversion.
+    Accepts:
+      - audio (file): the audio file
+      - language (str): BCP-47 code for recognition, e.g. 'en-US' (default)
+      - translate_to (str): ISO-639-1 code to translate the transcript into, e.g. 'hi'
+    """
+    temp_path = None
+    try:
+        if 'audio' not in request.files:
+            return jsonify({'error': 'Audio file is required'}), 400
+
+        audio_file = request.files['audio']
+
+        if audio_file.filename == '':
+            return jsonify({'error': 'No audio file selected'}), 400
+
+        # Recognition language from form (BCP-47, e.g. 'hi-IN', 'en-US')
+        language = request.form.get('language', 'en-US')
+
+        # Optional translation target (ISO-639-1, e.g. 'hi', 'fr')
+        translate_to = request.form.get('translate_to', '').strip()
+
+        # Preserve original file extension so pydub can identify the format
+        original_ext = os.path.splitext(audio_file.filename)[1] or '.wav'
+
+        # Save uploaded file to a temporary path
+        with tempfile.NamedTemporaryFile(delete=False, suffix=original_ext) as temp_file:
             temp_path = temp_file.name
 
         audio_file.save(temp_path)
@@ -266,11 +324,9 @@ def api_summarize():
         # Step 2: Translate if a different output language was requested
         translated_text = None
         if translate_to:
-            # Derive a simple 2-letter base from BCP-47 (e.g. 'hi-IN' -> 'hi')
             recognition_base = language.split('-')[0].lower()
             target_base = translate_to.split('-')[0].lower()
 
-            # Only translate if target differs from recognition language
             if recognition_base != target_base:
                 try:
                     translated_text = translator.translate(
@@ -295,7 +351,6 @@ def api_summarize():
     except Exception as e:
         return jsonify({'error': f'Speech-to-text conversion failed: {str(e)}'}), 500
     finally:
-        # Always clean up the temp file
         if temp_path and os.path.exists(temp_path):
             try:
                 os.unlink(temp_path)
