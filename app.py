@@ -138,7 +138,9 @@ def speech_page():
     """
     Speech processing page (Speech-to-Text and Text-to-Speech)
     """
-    return render_template('speech.html')
+    supported_tts_languages = text_to_speech.get_supported_languages()
+    tts_language_options = sorted(supported_tts_languages.items(), key=lambda x: x[1])
+    return render_template('speech.html', tts_language_options=tts_language_options)
 
 @app.route('/email')
 def email_page():
@@ -169,16 +171,46 @@ def automation_page():
 @app.route('/api/summarize', methods=['POST'])
 def api_summarize():
     """
-    API endpoint for text summarization
+    API endpoint for text or file summarization.
+    Supports:
+      - JSON body with text
+      - multipart/form-data with file (.pdf, .docx, .pptx, .txt, .text, .md)
     """
+    temp_path = None
     try:
-        data = request.get_json()
-        text = data.get('text', '').strip()
-        summary_length = data.get('summary_length', 'medium')
-        summary_style = data.get('summary_style', 'paragraph')
-        
+        text = ''
+        summary_length = 'medium'
+        summary_style = 'paragraph'
+        input_source = 'text'
+        uploaded_name = None
+
+        # File mode (multipart upload)
+        if 'file' in request.files and request.files['file'].filename:
+            uploaded = request.files['file']
+            uploaded_name = uploaded.filename
+            summary_length = request.form.get('summary_length', 'medium')
+            summary_style = request.form.get('summary_style', 'paragraph')
+            input_source = 'file'
+
+            allowed_extensions = {'.pdf', '.docx', '.pptx', '.txt', '.text', '.md'}
+            file_ext = os.path.splitext(uploaded.filename)[1].lower()
+            if file_ext not in allowed_extensions:
+                return jsonify({'error': 'Unsupported file format. Allowed: PDF, DOCX, PPTX, TXT, MD'}), 400
+
+            with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as temp_file:
+                temp_path = temp_file.name
+
+            uploaded.save(temp_path)
+            text = (plagiarism_checker.extract_text_from_file(temp_path) or '').strip()
+        else:
+            # Text mode (JSON or form)
+            data = request.get_json(silent=True) if request.is_json else request.form
+            text = (data.get('text', '') if data else '').strip()
+            summary_length = (data.get('summary_length', 'medium') if data else 'medium')
+            summary_style = (data.get('summary_style', 'paragraph') if data else 'paragraph')
+
         if not text:
-            return jsonify({'error': 'Text is required'}), 400
+            return jsonify({'error': 'No readable text found. Provide text input or upload a supported file.'}), 400
         
         if len(text) < 100:
             return jsonify({'error': 'Text must be at least 100 characters long for meaningful summarization'}), 400
@@ -190,11 +222,19 @@ def api_summarize():
             'success': True,
             'summary': summary,
             'original_length': len(text),
-            'summary_length': len(summary)
+            'summary_length': len(summary),
+            'input_source': input_source,
+            'file_name': uploaded_name,
         })
         
     except Exception as e:
         return jsonify({'error': f'Summarization failed: {str(e)}'}), 500
+    finally:
+        if temp_path and os.path.exists(temp_path):
+            try:
+                os.unlink(temp_path)
+            except Exception:
+                pass
 
 @app.route('/api/translate', methods=['POST'])
 def api_translate():
@@ -285,6 +325,10 @@ def api_speech_to_text():
             'output_language': translate_to or language,
         })
 
+    except (ValueError, FileNotFoundError) as e:
+        return jsonify({'error': str(e)}), 400
+    except RuntimeError as e:
+        return jsonify({'error': str(e)}), 503
     except Exception as e:
         return jsonify({'error': f'Speech-to-text conversion failed: {str(e)}'}), 500
     finally:

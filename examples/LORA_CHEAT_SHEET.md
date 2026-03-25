@@ -13,12 +13,14 @@ Quick reference for explaining LoRA in your project review.
 ## 🔑 Key Points to Mention
 
 ### ✅ What LoRA Is
+
 - **L**ow-**R**ank **A**daptation
 - A method to efficiently fine-tune large language models
 - Created by Microsoft Research (paper: https://arxiv.org/abs/2106.09685)
 - Used by OpenAI, Meta, Google for model customization
 
 ### ✅ Why We Chose LoRA
+
 1. **Cost Efficient** - 90% cheaper than full fine-tuning
 2. **Fast Training** - Hours vs. weeks for full training
 3. **Memory Efficient** - Runs on standard hardware (no 24GB GPU needed)
@@ -26,6 +28,7 @@ Quick reference for explaining LoRA in your project review.
 5. **Domain Specific** - Create custom models for different industries
 
 ### ✅ How It Works (Technical)
+
 ```
 Traditional Fine-Tuning:
 Base Model (300M params) → All updated during training
@@ -38,14 +41,14 @@ Base Model (300M params) + LoRA Adapter (300K params) → Only adapter updated
 
 ## 📊 Numbers That Impress Reviewers
 
-| Factor | Traditional | LoRA |
-|--------|---|---|
-| Parameters Trained | 100% | 0.1% |
-| GPU Memory | 16-24 GB | 4-8 GB (or CPU) |
-| Training Time | 5-48 hrs | 30 mins - 2 hrs |
-| Model File Size | 1.2 GB | 5-10 MB |
-| Cost to Train | $50-500 | $1-5 |
-| Inference Latency | Same | Same |
+| Factor             | Traditional | LoRA            |
+| ------------------ | ----------- | --------------- |
+| Parameters Trained | 100%        | 0.1%            |
+| GPU Memory         | 16-24 GB    | 4-8 GB (or CPU) |
+| Training Time      | 5-48 hrs    | 30 mins - 2 hrs |
+| Model File Size    | 1.2 GB      | 5-10 MB         |
+| Cost to Train      | $50-500     | $1-5            |
+| Inference Latency  | Same        | Same            |
 
 💡 **Key**: LoRA adapters are merged into the base model—zero performance penalty!
 
@@ -80,7 +83,7 @@ A: "No, it's an efficiency tool. For critical applications, you'd still want ful
 **Q: "Can we add LoRA to all services?"**  
 A: "Yes. Summarizer, Translator, plagiarism detection—any transformer-based model can use LoRA. We'd prioritize based on customer demand."
 
-**Q: "How long would it take to fine-tune on *our* data?"**  
+**Q: "How long would it take to fine-tune on _our_ data?"**  
 A: "Depends on dataset size. With 1000 examples: 2-4 hours. With 10K examples: 8-24 hours on standard hardware."
 
 **Q: "What if LoRA doesn't give good results?"**  
@@ -99,7 +102,7 @@ When you show this demo, you're saying:
 ✅ "We can handle customer-specific requirements"  
 ✅ "We have a path from MVP to production"  
 ✅ "We're thinking about cost and efficiency"  
-✅ "We can actually demonstrate fine-tuning works"  
+✅ "We can actually demonstrate fine-tuning works"
 
 ---
 
@@ -167,7 +170,7 @@ When you're done explaining LoRA, the reviewer should think:
 ✅ "They have a competitive advantage (cost efficiency)"  
 ✅ "They're ready for enterprise features"  
 ✅ "They can execute this if needed"  
-✅ "This is a differentiator, not just talk"  
+✅ "This is a differentiator, not just talk"
 
 ---
 

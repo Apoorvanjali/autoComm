@@ -53,23 +53,28 @@ class SpeechToTextConverter:
             language (str): BCP-47 language code, e.g. 'en-US', 'es-ES'
 
         Returns:
-            str: Transcribed text or descriptive error message
+            str: Transcribed text
+
+        Raises:
+            RuntimeError: If speech libraries/services are unavailable
+            FileNotFoundError: If input file does not exist
+            ValueError: If file is empty or speech cannot be decoded
         """
         if not SR_AVAILABLE or self.recognizer is None:
-            return "Speech recognition library is not available. Please install: pip install SpeechRecognition"
+            raise RuntimeError(
+                "SpeechRecognition library is not available. Install with: pip install SpeechRecognition"
+            )
 
         if not os.path.exists(audio_file_path):
-            return "Audio file not found. Please upload a valid audio file."
+            raise FileNotFoundError("Audio file not found. Please upload a valid audio file.")
 
         if os.path.getsize(audio_file_path) == 0:
-            return "The uploaded audio file is empty. Please upload a file with actual audio content."
+            raise ValueError("The uploaded audio file is empty. Please upload a file with actual audio content.")
 
         wav_path = None
         try:
             # Convert to WAV if necessary
             wav_path = self._to_wav(audio_file_path)
-            if wav_path is None:
-                return "Could not process audio file. Please upload a WAV, MP3, OGG, or FLAC file."
 
             # Load and recognize
             with sr.AudioFile(wav_path) as source:
@@ -81,18 +86,25 @@ class SpeechToTextConverter:
                 audio_data = self.recognizer.record(source)
 
             text = self._recognize_with_fallback(audio_data, language)
-            return text or "Could not understand the audio. Please ensure the recording has clear speech."
+            if not text:
+                raise ValueError(
+                    "Could not understand the audio. Please ensure the recording has clear speech and the selected language matches the recording."
+                )
+            return text
 
         except sr.UnknownValueError:
-            return "No speech detected in the audio. Please upload a file with clear spoken words."
+            raise ValueError("No speech detected in the audio. Please upload a file with clear spoken words.")
         except sr.RequestError as e:
-            return (
+            raise RuntimeError(
                 f"Speech recognition service error: {str(e)}. "
                 "Please check your internet connection and try again."
             )
         except Exception as e:
             print(f"❌ Speech-to-text error: {e}")
-            return f"Error processing audio file: {str(e)}. Please try again with a different file."
+            raise RuntimeError(
+                f"Error processing audio file: {str(e)}. "
+                "For MP3/M4A/WEBM, ensure ffmpeg is installed and available on PATH."
+            )
         finally:
             # Clean up temp WAV if it was created
             if wav_path and wav_path != audio_file_path and os.path.exists(wav_path):
@@ -113,9 +125,10 @@ class SpeechToTextConverter:
             return audio_file_path
 
         if not PYDUB_AVAILABLE:
-            print("⚠️ PyDub not available, attempting to use file as-is")
-            # Try the file as-is in case it is actually PCM/WAV
-            return audio_file_path
+            raise RuntimeError(
+                "PyDub is not available to convert this audio format. "
+                "Install with: pip install pydub, or upload a WAV file."
+            )
 
         try:
             # Determine format from extension
@@ -139,8 +152,10 @@ class SpeechToTextConverter:
             return temp_wav.name
 
         except Exception as e:
-            print(f"⚠️ Audio conversion failed: {e} — trying original file")
-            return audio_file_path
+            raise RuntimeError(
+                f"Audio conversion failed: {e}. "
+                "For MP3/M4A/WEBM input, install ffmpeg and ensure it is on PATH."
+            )
 
     def _recognize_with_fallback(self, audio_data, language):
         """

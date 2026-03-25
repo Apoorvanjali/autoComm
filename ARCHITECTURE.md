@@ -1,6 +1,7 @@
 # AutoComm - End-to-End Architecture Document
 
 ## Table of Contents
+
 1. [System Overview](#system-overview)
 2. [High-Level Architecture](#high-level-architecture)
 3. [Component Architecture](#component-architecture)
@@ -90,14 +91,15 @@
 
 ### 1. **Presentation Layer (Frontend)**
 
-| Component | Technology | Responsibility |
-|-----------|-----------|-----------------|
-| **Templates** | Jinja2 | Render HTML with dynamic content |
-| **Static JS** | Vanilla JavaScript | Handle AJAX requests, UI interactions |
-| **Styling** | Bootstrap 5.3 + Custom CSS | Responsive design, visual components |
-| **Assets** | Font Awesome, Google Fonts | Icons, typography |
+| Component     | Technology                 | Responsibility                        |
+| ------------- | -------------------------- | ------------------------------------- |
+| **Templates** | Jinja2                     | Render HTML with dynamic content      |
+| **Static JS** | Vanilla JavaScript         | Handle AJAX requests, UI interactions |
+| **Styling**   | Bootstrap 5.3 + Custom CSS | Responsive design, visual components  |
+| **Assets**    | Font Awesome, Google Fonts | Icons, typography                     |
 
 **Key Features:**
+
 - Async API calls with fetch API
 - Real-time form validation
 - Progress indicators for long-running tasks
@@ -137,6 +139,7 @@ app.py
 Located in `services/` directory, each service is a standalone class:
 
 #### **3.1 TextSummarizer**
+
 ```python
 class TextSummarizer:
     def __init__(self)
@@ -144,12 +147,14 @@ class TextSummarizer:
     def _ensure_model()          # Lazy load transformer
     def _extract_summary()       # Fallback extraction-based
 ```
+
 - **Models**: BART (primary), DistilBART (fallback)
 - **Modes**: Paragraph, Bullet points
 - **Lengths**: Short (30-130 tokens), Medium (80-250), Long (150-400)
 - **Fallback**: TF-IDF extraction-based summarization
 
 #### **3.2 LanguageTranslator**
+
 ```python
 class LanguageTranslator:
     def __init__(self)
@@ -158,12 +163,14 @@ class LanguageTranslator:
     def _translate_with_google()
     def _fallback_translate()
 ```
+
 - **Primary**: Google Translate (via `deep-translator`)
 - **Support**: 12+ languages
 - **Auto-detection**: Automatic source language identification
 - **Fallback**: Basic word-level translation dictionary
 
 #### **3.3 SpeechToTextConverter**
+
 ```python
 class SpeechToTextConverter:
     def __init__(self)
@@ -171,12 +178,14 @@ class SpeechToTextConverter:
     def _preprocess_audio()
     def _recognize_with_google()
 ```
+
 - **Engines**: Google Speech API (primary), CMU Sphinx (fallback)
 - **Formats**: WAV, MP3, M4A
 - **Languages**: 12+ language variants
 - **Features**: Noise handling, audio preprocessing
 
 #### **3.4 TextToSpeechConverter**
+
 ```python
 class TextToSpeechConverter:
     def __init__(self)
@@ -184,12 +193,14 @@ class TextToSpeechConverter:
     def save_audio_file()
     def get_supported_languages()
 ```
+
 - **Engine**: gTTS (Google Text-to-Speech)
 - **Output**: MP3 format
 - **Languages**: 25+ languages
 - **Speed Control**: Normal, Slow
 
 #### **3.5 EmailService**
+
 ```python
 class EmailService:
     def __init__(self)
@@ -198,31 +209,36 @@ class EmailService:
     def _create_message()
     def _send_via_smtp()
 ```
+
 - **SMTP Providers**: Gmail, Yahoo, Outlook, Hotmail, Live
 - **Security**: App password support, SSL/TLS encryption
 - **Templates**: Professional email templates
 - **Attachments**: Support for file attachments
 
 #### **3.6 PlagiarismChecker**
+
 ```python
 class PlagiarismChecker:
     def check_plagiarism(text, check_online=False, mode='advanced')
     def _calculate_similarity()
     def _check_against_corpus()
 ```
+
 - **Local**: Offline similarity checking using scikit-learn
 - **Online**: Optional web-based checking
 - **Modes**: Basic, Advanced
 - **Metrics**: Cosine similarity, TF-IDF
 
 #### **3.7 WorkflowAutomationService (Orchestrator)**
+
 ```python
 class WorkflowAutomationService:
-    def __init__(self, summarizer, translator, text_to_speech, 
+    def __init__(self, summarizer, translator, text_to_speech,
                  email_service, plagiarism_checker)
-    def run_workflow(input_text, file_path, summary_length, 
+    def run_workflow(input_text, file_path, summary_length,
                      target_language, sender_email, receiver_email, ...)
 ```
+
 - **Pipeline**: Extract → Plagiarism Check → Summarize → Translate → Speech → Email
 - **Status Tracking**: Real-time step-by-step status updates
 - **Error Handling**: Graceful fallback at each stage
@@ -276,7 +292,9 @@ autoComm/
 ### Design Patterns Used
 
 #### **1. Service Layer Pattern**
+
 Each service is instantiated once at app startup and injected into routes:
+
 ```python
 # In app.py
 summarizer = TextSummarizer()
@@ -285,7 +303,9 @@ translator = LanguageTranslator()
 ```
 
 #### **2. Dependency Injection**
+
 WorkflowAutomationService receives dependencies in constructor:
+
 ```python
 workflow_automation = WorkflowAutomationService(
     summarizer=summarizer,
@@ -297,7 +317,9 @@ workflow_automation = WorkflowAutomationService(
 ```
 
 #### **3. Graceful Degradation / Fallback Pattern**
+
 Each service has primary and fallback implementations:
+
 ```python
 # Primary: Use transformer model
 if TRANSFORMERS_AVAILABLE:
@@ -308,7 +330,9 @@ else:
 ```
 
 #### **4. Lazy Initialization Pattern**
+
 Heavy models (transformers) load only when first used:
+
 ```python
 def _ensure_model(self):
     if self.summarizer is None:
@@ -316,7 +340,9 @@ def _ensure_model(self):
 ```
 
 #### **5. Configuration Pattern**
+
 Environment-based configuration for flexibility:
+
 ```python
 LENGTH_CONFIGS = {
     'short':  {'min_length': 30, 'max_length': 130},
@@ -452,39 +478,39 @@ USER INITIATES WORKFLOW
 
 ### Backend
 
-| Layer | Technology | Version | Purpose |
-|-------|-----------|---------|---------|
-| **Framework** | Flask | 3.0+ | HTTP server, routing, session management |
-| **WSGI Server** | Werkzeug | 3.0+ | Production-ready web server adapter |
-| **NLP/Summarization** | Hugging Face Transformers | 4.30+ | BART/DistilBART models |
-| **ML Framework** | PyTorch | 2.0+ | Deep learning backend for transformers |
-| **Translation** | deep-translator | 1.11+ | Google Translate integration |
-| **Speech Recognition** | SpeechRecognition | 3.10+ | Google Speech API wrapper |
-| **Text-to-Speech** | gTTS | 2.3+ | Google Text-to-Speech integration |
-| **Audio Processing** | pydub | 0.25+ | Audio file manipulation |
-| **Plagiarism Detection** | scikit-learn | 1.0+ | TF-IDF similarity scoring |
-| **File Processing** | PyPDF2, python-docx | Latest | Extract text from documents |
-| **Web Utilities** | requests, urllib3 | Latest | HTTP client library |
+| Layer                    | Technology                | Version | Purpose                                  |
+| ------------------------ | ------------------------- | ------- | ---------------------------------------- |
+| **Framework**            | Flask                     | 3.0+    | HTTP server, routing, session management |
+| **WSGI Server**          | Werkzeug                  | 3.0+    | Production-ready web server adapter      |
+| **NLP/Summarization**    | Hugging Face Transformers | 4.30+   | BART/DistilBART models                   |
+| **ML Framework**         | PyTorch                   | 2.0+    | Deep learning backend for transformers   |
+| **Translation**          | deep-translator           | 1.11+   | Google Translate integration             |
+| **Speech Recognition**   | SpeechRecognition         | 3.10+   | Google Speech API wrapper                |
+| **Text-to-Speech**       | gTTS                      | 2.3+    | Google Text-to-Speech integration        |
+| **Audio Processing**     | pydub                     | 0.25+   | Audio file manipulation                  |
+| **Plagiarism Detection** | scikit-learn              | 1.0+    | TF-IDF similarity scoring                |
+| **File Processing**      | PyPDF2, python-docx       | Latest  | Extract text from documents              |
+| **Web Utilities**        | requests, urllib3         | Latest  | HTTP client library                      |
 
 ### Frontend
 
-| Component | Technology | Version | Purpose |
-|-----------|-----------|---------|---------|
-| **CSS Framework** | Bootstrap | 5.3+ | Responsive grid, components |
-| **Icons** | Font Awesome | 6.0+ | UI icons |
-| **Fonts** | Google Fonts | Latest | Typography (Inter font family) |
-| **JavaScript** | Vanilla JS (EC6) | - | AJAX, DOM manipulation |
-| **Templating** | Jinja2 | - | Server-side HTML rendering |
+| Component         | Technology       | Version | Purpose                        |
+| ----------------- | ---------------- | ------- | ------------------------------ |
+| **CSS Framework** | Bootstrap        | 5.3+    | Responsive grid, components    |
+| **Icons**         | Font Awesome     | 6.0+    | UI icons                       |
+| **Fonts**         | Google Fonts     | Latest  | Typography (Inter font family) |
+| **JavaScript**    | Vanilla JS (EC6) | -       | AJAX, DOM manipulation         |
+| **Templating**    | Jinja2           | -       | Server-side HTML rendering     |
 
 ### Infrastructure & DevOps
 
-| Component | Purpose |
-|-----------|---------|
-| **Python Version** | 3.8+ |
-| **Virtual Environment** | `.venv/` (venv) |
-| **Package Manager** | pip |
-| **Development Server** | Flask development server (debug mode) |
-| **Production Server** | Gunicorn / uWSGI (recommended) |
+| Component               | Purpose                               |
+| ----------------------- | ------------------------------------- |
+| **Python Version**      | 3.8+                                  |
+| **Virtual Environment** | `.venv/` (venv)                       |
+| **Package Manager**     | pip                                   |
+| **Development Server**  | Flask development server (debug mode) |
+| **Production Server**   | Gunicorn / uWSGI (recommended)        |
 
 ---
 
@@ -514,18 +540,21 @@ USER INITIATES WORKFLOW
 ### Service Call Patterns
 
 #### **Pattern 1: Direct Service Usage (Single Service)**
+
 ```
 User Request → Flask Route → Single Service → External API → Response
 ```
 
 #### **Pattern 2: Service Composition (Workflow)**
+
 ```
-User Request → Flask Route → WorkflowService 
-    → Service1 → Service2 → Service3 → ... 
+User Request → Flask Route → WorkflowService
+    → Service1 → Service2 → Service3 → ...
     → Aggregate Results → Response
 ```
 
 #### **Pattern 3: Fallback Chain**
+
 ```
 User Request → Primary Service
     → If fails: Fallback Service 1
@@ -567,6 +596,7 @@ API Endpoints (JSON Responses)
 ### Request/Response Examples
 
 #### **1. Summarization API**
+
 ```
 POST /api/summarize
 
@@ -594,6 +624,7 @@ Response (400 Bad Request):
 ```
 
 #### **2. Translation API**
+
 ```
 POST /api/translate
 
@@ -614,6 +645,7 @@ Response (200 OK):
 ```
 
 #### **3. Email API**
+
 ```
 POST /api/send-email
 
@@ -641,6 +673,7 @@ Response (400 / 401 Error):
 ```
 
 #### **4. Workflow API (Multi-Step)**
+
 ```
 POST /api/workflow
 
@@ -785,23 +818,23 @@ Response Format:
 class ProductionConfig:
     DEBUG = False
     TESTING = False
-    
+
     # Security
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
     PERMANENT_SESSION_LIFETIME = 3600
-    
+
     # File uploads
     MAX_CONTENT_LENGTH = 100 * 1024 * 1024  # 100MB
     UPLOAD_FOLDER = '/secure/uploads'
-    
+
     # Model caching
     MODEL_CACHE_DIR = '/models/cache'
-    
+
     # Logging
     LOG_LEVEL = 'INFO'
     LOG_FILE = '/var/log/autocomm/app.log'
-    
+
     # External service timeouts
     SPEECH_API_TIMEOUT = 30
     TRANSLATION_TIMEOUT = 10
@@ -813,6 +846,7 @@ class ProductionConfig:
 ## Security Considerations
 
 ### Authentication & Authorization
+
 - ✅ Session-based authentication
 - ✅ Password validation (minimum 8 characters)
 - ⚠️ TODO: Database-backed user store (currently in-memory)
@@ -820,6 +854,7 @@ class ProductionConfig:
 - ⚠️ TODO: Rate limiting on API endpoints
 
 ### Data Protection
+
 - ✅ Input validation on all endpoints
 - ✅ File upload validation
 - ✅ Secret key management
@@ -828,6 +863,7 @@ class ProductionConfig:
 - ⚠️ TODO: Audit logging for all operations
 
 ### API Security
+
 - ✅ CSRF protection (Flask sessions)
 - ✅ File size limits
 - ⚠️ TODO: Rate limiting
@@ -839,12 +875,14 @@ class ProductionConfig:
 ## Performance Optimization
 
 ### Current Optimizations
+
 1. **Lazy Model Loading**: Transformers loaded only on first use
 2. **Fallback Strategies**: Quick extraction-based fallbacks
 3. **Caching**: Model caching via Hugging Face Hub
 4. **Timeouts**: Prevent hanging requests
 
 ### Recommended Optimizations
+
 1. **Model Quantization**: Use quantized/distilled models (DistilBART)
 2. **Batch Processing**: Process multiple requests in batches
 3. **Async Tasks**: Use Celery for long-running operations
@@ -858,17 +896,20 @@ class ProductionConfig:
 ## Testing Strategy
 
 ### Unit Tests
+
 - Service-level tests for each AI service
 - Mock external APIs
 - Test fallback mechanisms
 - Example: `test_summarizer.py`
 
 ### Integration Tests
+
 - Test end-to-end workflows
 - Test service composition
 - Test error handling
 
 ### Load Tests
+
 - Simulate concurrent users
 - Stress test model inference
 - Measure API response times
@@ -878,6 +919,7 @@ class ProductionConfig:
 ## Monitoring & Logging
 
 ### Key Metrics to Monitor
+
 - API response times
 - Model inference time
 - Error rates by service
@@ -886,6 +928,7 @@ class ProductionConfig:
 - External API availability
 
 ### Logging Strategy
+
 ```python
 import logging
 
@@ -910,6 +953,7 @@ logger.error(f"Summarization failed: {exception}")
 AutoComm is an enterprise-grade AI platform with a **clean separation of concerns**, **resilience through fallbacks**, and **scalable architecture**. The service layer pattern allows easy extension with new AI features, while the orchestra pattern enables complex multi-step workflows.
 
 **Key Strengths:**
+
 - Modular, maintainable codebase
 - Multiple fallback strategies
 - Integration with state-of-the-art AI models
@@ -917,6 +961,7 @@ AutoComm is an enterprise-grade AI platform with a **clean separation of concern
 - RESTful API design
 
 **Future Enhancements:**
+
 - Production database integration
 - Advanced authentication (OAuth, MFA)
 - Advanced monitoring & analytics

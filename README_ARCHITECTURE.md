@@ -5,9 +5,11 @@ Welcome! This folder contains comprehensive documentation for the AutoComm proje
 ## 📚 Documentation Files
 
 ### 1. **ARCHITECTURE.md** (Comprehensive Technical Reference)
+
 **Length**: 15+ pages | **Audience**: Technical leads, architects, engineers
 
 **Contains**:
+
 - Complete system overview and components
 - High-level and component-level architecture
 - Code-level architecture with design patterns
@@ -19,6 +21,7 @@ Welcome! This folder contains comprehensive documentation for the AutoComm proje
 - Performance optimizations
 
 **Best for**:
+
 - ✅ Detailed technical discussions
 - ✅ Understanding design decisions
 - ✅ Implementation references
@@ -29,9 +32,11 @@ Welcome! This folder contains comprehensive documentation for the AutoComm proje
 ---
 
 ### 2. **ARCHITECTURE_DIAGRAMS.md** (Visual & Reference Guide)
+
 **Length**: 20+ pages | **Audience**: All stakeholders (visual learners)
 
 **Contains**:
+
 - ASCII diagrams for all major architecture views
 - Data flow visualizations
 - Service communication patterns
@@ -44,6 +49,7 @@ Welcome! This folder contains comprehensive documentation for the AutoComm proje
 - Troubleshooting guide
 
 **Best for**:
+
 - ✅ Quick visual understanding
 - ✅ Design review presentations
 - ✅ Team discussions
@@ -54,9 +60,11 @@ Welcome! This folder contains comprehensive documentation for the AutoComm proje
 ---
 
 ### 3. **PROJECT_REVIEW_GUIDE.md** (Executive Summary + Q&A)
+
 **Length**: 10+ pages | **Audience**: Managers, reviewers, stakeholders
 
 **Contains**:
+
 - 30-second elevator pitch
 - Key metrics and statistics
 - 7 core services breakdown
@@ -73,6 +81,7 @@ Welcome! This folder contains comprehensive documentation for the AutoComm proje
 - Common questions & answers
 
 **Best for**:
+
 - ✅ Executive presentations
 - ✅ Quick onboarding
 - ✅ Stakeholder updates
@@ -88,11 +97,13 @@ Welcome! This folder contains comprehensive documentation for the AutoComm proje
 ### For Your Project Review
 
 **Before the review** (30 minutes prep):
+
 1. Read **PROJECT_REVIEW_GUIDE.md** (quick overview)
 2. Skim **ARCHITECTURE_DIAGRAMS.md** (visual understanding)
 3. Bookmark **ARCHITECTURE.md** for detailed questions
 
 **During the review** (60 minutes):
+
 1. Start with the **30-second pitch** from PROJECT_REVIEW_GUIDE
 2. Use **4-layer architecture diagram** to explain design
 3. Show **request flow examples** from ARCHITECTURE
@@ -101,6 +112,7 @@ Welcome! This folder contains comprehensive documentation for the AutoComm proje
 6. Be transparent about **areas for improvement**
 
 **Handling tough questions**:
+
 - "Why did you choose X?" → See ARCHITECTURE.md Technology Stack
 - "How does Y work?" → See ARCHITECTURE_DIAGRAMS.md Data Flow
 - "What's the cost?" → See PROJECT_REVIEW_GUIDE.md Cost Estimate
@@ -111,18 +123,18 @@ Welcome! This folder contains comprehensive documentation for the AutoComm proje
 
 ## 📊 Document Quick Reference
 
-| Question | Document | Section |
-|----------|----------|---------|
-| What is AutoComm? | PROJECT_REVIEW | 30-Second Pitch |
-| How does it work? | ARCHITECTURE | Data Flow Section |
-| What are the services? | PROJECT_REVIEW | 7 Core Services |
-| How do I deploy it? | ARCHITECTURE | Deployment & Scaling |
-| What's the tech stack? | PROJECT_REVIEW | Technology Stack |
-| Show me a diagram | ARCHITECTURE_DIAGRAMS | Any diagram |
-| What's the cost? | PROJECT_REVIEW | Cost Estimate |
-| Is it secure? | PROJECT_REVIEW | Security Assessment |
-| What's the roadmap? | PROJECT_REVIEW | Areas for Improvement |
-| Common questions? | PROJECT_REVIEW | Q&A Section |
+| Question               | Document              | Section               |
+| ---------------------- | --------------------- | --------------------- |
+| What is AutoComm?      | PROJECT_REVIEW        | 30-Second Pitch       |
+| How does it work?      | ARCHITECTURE          | Data Flow Section     |
+| What are the services? | PROJECT_REVIEW        | 7 Core Services       |
+| How do I deploy it?    | ARCHITECTURE          | Deployment & Scaling  |
+| What's the tech stack? | PROJECT_REVIEW        | Technology Stack      |
+| Show me a diagram      | ARCHITECTURE_DIAGRAMS | Any diagram           |
+| What's the cost?       | PROJECT_REVIEW        | Cost Estimate         |
+| Is it secure?          | PROJECT_REVIEW        | Security Assessment   |
+| What's the roadmap?    | PROJECT_REVIEW        | Areas for Improvement |
+| Common questions?      | PROJECT_REVIEW        | Q&A Section           |
 
 ---
 
@@ -184,7 +196,7 @@ AutoComm = 7 Independent AI Services + Flask Router + Web UI
 ✅ Graceful degradation (returns partial results if needed)  
 ✅ Easy to scale (stateless design)  
 ✅ Simple to debug (clear service boundaries)  
-✅ Quick to extend (new services are independent)  
+✅ Quick to extend (new services are independent)
 
 ---
 
@@ -193,28 +205,33 @@ AutoComm = 7 Independent AI Services + Flask Router + Web UI
 ### For Different Audiences
 
 **👔 Executives / Managers**
+
 1. This file (overview)
 2. PROJECT_REVIEW_GUIDE.md (5-10 min)
 3. ARCHITECTURE_DIAGRAMS.md (diagrams only)
 
 **👨‍💼 Product Managers**
+
 1. This file (overview)
 2. PROJECT_REVIEW_GUIDE.md (full)
 3. ARCHITECTURE_DIAGRAMS.md (request flows)
 
 **👨‍💻 Full-Stack Engineers**
+
 1. This file (overview)
 2. ARCHITECTURE.md (full)
 3. ARCHITECTURE_DIAGRAMS.md (reference)
 4. PROJECT_REVIEW_GUIDE.md (troubleshooting)
 
 **🏗️ Architects / Technical Leads**
+
 1. This file (overview)
 2. ARCHITECTURE.md (full, especially Deployment section)
 3. ARCHITECTURE_DIAGRAMS.md (all diagrams)
 4. PROJECT_REVIEW_GUIDE.md (roadmap & security)
 
 **🆕 New Team Members**
+
 1. This file (overview)
 2. PROJECT_REVIEW_GUIDE.md (60-minute orientation)
 3. ARCHITECTURE_DIAGRAMS.md (visual reference)
@@ -225,21 +242,27 @@ AutoComm = 7 Independent AI Services + Flask Router + Web UI
 ## 🎓 Learning Paths
 
 ### "I have 5 minutes"
+
 → Read PROJECT_REVIEW_GUIDE.md "30-Second Pitch" + "Key Metrics"
 
 ### "I have 15 minutes"
+
 → Read this file + PROJECT_REVIEW_GUIDE.md "Architecture Summary" + "4 Layers"
 
 ### "I have 30 minutes"
+
 → Read PROJECT_REVIEW_GUIDE.md + ARCHITECTURE_DIAGRAMS.md (diagrams)
 
 ### "I have 1 hour"
+
 → Read ARCHITECTURE.md "High-Level Architecture" + "Component Architecture"
 
 ### "I have 2 hours"
+
 → Read all three documents in order
 
 ### "I need deep understanding"
+
 → Read all documents + review source code (app.py, services/)
 
 ---
@@ -261,9 +284,11 @@ AutoComm = 7 Independent AI Services + Flask Router + Web UI
 ## 💡 Pro Tips for Your Review
 
 ### Opening Statement (2 minutes)
+
 "AutoComm is an enterprise AI-powered communication platform with 7 independent microservices. It enables users to summarize documents, translate text, process speech, send emails, and detect plagiarism—either individually or as part of an orchestrated workflow. The architecture emphasizes modularity, resilience through fallbacks, and horizontal scalability."
 
 ### Showing Strength (3 minutes)
+
 - Mention the 7 independent services
 - Highlight the fallback mechanisms
 - Show the clean 4-layer architecture
@@ -271,6 +296,7 @@ AutoComm = 7 Independent AI Services + Flask Router + Web UI
 - Point out the extensibility
 
 ### Addressing Concerns (2 minutes)
+
 - Be honest about limitations:
   - Single instance can handle ~3-5 workflows/minute
   - Needs database for production
@@ -280,6 +306,7 @@ AutoComm = 7 Independent AI Services + Flask Router + Web UI
 - Explain the path to production-ready
 
 ### Demonstrating Understanding (5 minutes)
+
 - Explain data flow for one request
 - Show a service interaction diagram
 - Discuss why you chose each technology
@@ -291,6 +318,7 @@ AutoComm = 7 Independent AI Services + Flask Router + Web UI
 ## 🎬 Demo Scenarios (Copy & Paste)
 
 ### Quick Demo (5 minutes)
+
 ```
 1. Go to /summarizer
 2. Paste: "The quick brown fox jumped over the lazy dog..."
@@ -300,6 +328,7 @@ AutoComm = 7 Independent AI Services + Flask Router + Web UI
 ```
 
 ### Full Demo (15 minutes)
+
 ```
 1. Go to /automation
 2. Paste longer text (news article)
@@ -338,13 +367,14 @@ A: "Requires basic Python/DevOps knowledge. We're building Docker images to simp
 ✅ Reviewer sees the scalability path  
 ✅ Reviewer understands the roadmap  
 ✅ Reviewer asks follow-up questions (good sign!)  
-✅ Reviewer approves next phase funding/resources  
+✅ Reviewer approves next phase funding/resources
 
 ---
 
 ## 📖 Additional Resources
 
 **In the project directory**:
+
 - `app.py` - Main Flask router (start here for code)
 - `services/*.py` - Individual AI services
 - `templates/*.html` - UI pages
@@ -352,6 +382,7 @@ A: "Requires basic Python/DevOps knowledge. We're building Docker images to simp
 - `README.md` - User documentation
 
 **Online references**:
+
 - [Flask Documentation](https://flask.palletsprojects.com/)
 - [Hugging Face Transformers](https://huggingface.co/transformers/)
 - [Bootstrap Documentation](https://getbootstrap.com/docs/)
@@ -360,12 +391,12 @@ A: "Requires basic Python/DevOps knowledge. We're building Docker images to simp
 
 ## 📝 Document Metadata
 
-| Document | Length | Updated | Author | Status |
-|----------|--------|---------|--------|--------|
-| ARCHITECTURE.md | 15 pages | 2024-03 | Tech Team | Complete |
-| ARCHITECTURE_DIAGRAMS.md | 20 pages | 2024-03 | Tech Team | Complete |
-| PROJECT_REVIEW_GUIDE.md | 10 pages | 2024-03 | Tech Team | Complete |
-| README.md | 5 pages | 2024-03 | Project Lead | Complete |
+| Document                 | Length   | Updated | Author       | Status   |
+| ------------------------ | -------- | ------- | ------------ | -------- |
+| ARCHITECTURE.md          | 15 pages | 2024-03 | Tech Team    | Complete |
+| ARCHITECTURE_DIAGRAMS.md | 20 pages | 2024-03 | Tech Team    | Complete |
+| PROJECT_REVIEW_GUIDE.md  | 10 pages | 2024-03 | Tech Team    | Complete |
+| README.md                | 5 pages  | 2024-03 | Project Lead | Complete |
 
 ---
 

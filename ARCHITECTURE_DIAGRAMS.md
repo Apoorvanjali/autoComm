@@ -53,6 +53,7 @@
 ### 2. Service Communication Patterns
 
 #### Pattern A: Direct Request (Single Service)
+
 ```
 User Request
     ↓
@@ -66,6 +67,7 @@ Response to User
 ```
 
 #### Pattern B: Composition (Workflow Service)
+
 ```
 User Request
     ↓
@@ -84,6 +86,7 @@ Response to User
 ```
 
 #### Pattern C: Fallback Chain (Error Resilience)
+
 ```
 User Request
     ↓
@@ -107,6 +110,7 @@ Primary Service
 ### 3. Data Flow for Key Request Types
 
 #### Summarization Request Flow
+
 ```
 TEXT INPUT
     ↓
@@ -144,6 +148,7 @@ TOTAL FLOW: User Input → Validation → Model Inference → Response → Displ
 ```
 
 #### Email Automation Request Flow
+
 ```
 USER INPUTS EMAIL DETAILS
     ↓
@@ -189,6 +194,7 @@ ERROR HANDLING:
 ```
 
 #### Workflow (End-to-End) Request Flow
+
 ```
 WORKFLOW INPUT (Text, Language, Email, etc.)
     ↓
@@ -254,7 +260,7 @@ Frontend: Process & Display
     ├─ Provide download links
     └─ Show success message
 
-TIMELINE: Extraction ~ 1s → Plagiarism ~ 2-5s → Summarization ~ 3-8s → 
+TIMELINE: Extraction ~ 1s → Plagiarism ~ 2-5s → Summarization ~ 3-8s →
           Translation ~ 1-3s → Speech ~ 2-4s → Email ~ 1s = TOTAL ~10-25s
 ```
 
@@ -361,7 +367,7 @@ STRUCTURE SUMMARY:
         SpeechToTextConverter  │    TextToSpeechConverter
                         ↓
                 PlagiarismChecker
-                        
+
         All Services Injected Into:
                 WorkflowAutomationService
                         ↓
@@ -613,6 +619,7 @@ Post-Deployment
 ## Configuration Reference
 
 ### Environment Variables
+
 ```
 FLASK_ENV=production|development
 FLASK_DEBUG=0|1
@@ -643,14 +650,14 @@ LOG_FILE=/var/log/autocomm/app.log
 
 ## Troubleshooting Guide
 
-| Issue | Root Cause | Solution |
-|-------|-----------|----------|
-| Slow summarization | Model loading overhead | Use DistilBART or enable GPU |
-| Translation timeout | API rate limit | Implement request queue/backoff |
-| Email send failure | SMTP auth error | Verify app password, not regular password |
-| Speech recognition fails | Audio quality | Check audio format, try WAV instead of MP3 |
-| OOM on summarization | Model too large | Switch to smaller model (DistilBART) |
-| 503 Service Unavailable | External API down | Use fallback service |
+| Issue                    | Root Cause             | Solution                                   |
+| ------------------------ | ---------------------- | ------------------------------------------ |
+| Slow summarization       | Model loading overhead | Use DistilBART or enable GPU               |
+| Translation timeout      | API rate limit         | Implement request queue/backoff            |
+| Email send failure       | SMTP auth error        | Verify app password, not regular password  |
+| Speech recognition fails | Audio quality          | Check audio format, try WAV instead of MP3 |
+| OOM on summarization     | Model too large        | Switch to smaller model (DistilBART)       |
+| 503 Service Unavailable  | External API down      | Use fallback service                       |
 
 ---
 
@@ -662,6 +669,6 @@ LOG_FILE=/var/log/autocomm/app.log
 ✅ **Resilience**: Fallback strategies for every operation  
 ✅ **Scalability**: Stateless design, easy to distribute  
 ✅ **Maintainability**: Clean code, focused classes  
-✅ **Extensibility**: Easy to add new services/features  
+✅ **Extensibility**: Easy to add new services/features
 
 This architecture supports rapid development, easy testing, and straightforward deployment to production environments.

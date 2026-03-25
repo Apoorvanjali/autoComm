@@ -14,6 +14,101 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <style>
+        .language-keyboard-card {
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            background: var(--bg-card);
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .keyboard-wrapper {
+            position: relative;
+        }
+
+        .keyboard-number-row,
+        .keyboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .keyboard-number-row {
+            margin-bottom: 0.35rem;
+        }
+
+        .keyboard-key {
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-weight: 600;
+            min-height: 42px;
+        }
+
+        .keyboard-key:hover {
+            border-color: var(--warning);
+            color: var(--warning);
+        }
+
+        .keyboard-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .keyboard-controls .btn {
+            min-width: 90px;
+        }
+
+        .keyboard-key.alt-available {
+            position: relative;
+        }
+
+        .keyboard-key.alt-available::after {
+            content: '•';
+            position: absolute;
+            top: 2px;
+            right: 6px;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .key-alt-menu {
+            position: absolute;
+            display: none;
+            z-index: 30;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            box-shadow: var(--shadow-md);
+            padding: 0.35rem;
+            gap: 0.25rem;
+        }
+
+        .key-alt-menu.show {
+            display: flex;
+            flex-wrap: nowrap;
+        }
+
+        .key-alt-option {
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            min-width: 34px;
+            min-height: 34px;
+            font-weight: 600;
+        }
+
+        .key-alt-option:hover {
+            color: var(--warning);
+            border-color: var(--warning);
+        }
+    </style>
 </head>
 
 <body>
@@ -147,6 +242,7 @@
                                             required>
                                         <div class="form-text"><i class="fas fa-upload me-1"></i>Select an audio file to
                                             convert to text</div>
+                                        <div class="form-text text-warning"><i class="fas fa-info-circle me-1"></i>Best compatibility: WAV. MP3/M4A/WEBM also work when ffmpeg is installed on the server.</div>
                                     </div>
                                     <div class="d-grid">
                                         <button type="submit" class="btn btn-info btn-lg" id="convertSpeechBtn">
@@ -198,24 +294,39 @@
                                             maxlength="5000" required></textarea>
                                         <div class="form-text">Characters: <span id="textCharCount">0</span> / 5000
                                         </div>
+
+                                        <div class="language-keyboard-card">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="fw-bold">
+                                                    <i class="fas fa-keyboard me-1"></i>
+                                                    Text Input Keyboard
+                                                </div>
+                                                <span class="badge text-bg-light" id="ttsKeyboardLanguageLabel">English</span>
+                                            </div>
+                                            <div class="small mt-1" style="color: var(--text-secondary);">
+                                                Type text for speech in the selected voice language.
+                                            </div>
+                                            <div class="keyboard-wrapper">
+                                                <div id="ttsKeyboardNumberRow" class="keyboard-number-row" role="group" aria-label="TTS numbers and symbols"></div>
+                                                <div id="ttsLanguageKeyboard" class="keyboard-grid" role="group" aria-label="TTS language keypad"></div>
+                                                <div id="ttsKeyAltMenu" class="key-alt-menu" aria-label="Alternate characters"></div>
+                                            </div>
+                                            <div class="keyboard-controls">
+                                                <button type="button" class="btn btn-outline-warning btn-sm" id="ttsKeyboardShift">Shift Off</button>
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" id="ttsKeyboardSpace">Space</button>
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" id="ttsKeyboardBackspace">Backspace</button>
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" id="ttsKeyboardClear">Clear Input</button>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="row mb-4">
                                         <div class="col-md-6">
                                             <label for="voiceLanguage" class="form-label fw-bold"><i
                                                     class="fas fa-globe me-1"></i>Voice Language</label>
                                             <select id="voiceLanguage" class="form-select">
-                                                <option value="en">English</option>
-                                                <option value="es">Spanish</option>
-                                                <option value="fr">French</option>
-                                                <option value="de">German</option>
-                                                <option value="it">Italian</option>
-                                                <option value="pt">Portuguese</option>
-                                                <option value="ru">Russian</option>
-                                                <option value="ja">Japanese</option>
-                                                <option value="ko">Korean</option>
-                                                <option value="zh">Chinese</option>
-                                                <option value="ar">Arabic</option>
-                                                <option value="hi">Hindi</option>
+                                                {% for code, name in tts_language_options %}
+                                                <option value="{{ code }}" {% if code == 'en' %}selected{% endif %}>{{ name }}</option>
+                                                {% endfor %}
                                             </select>
                                         </div>
                                         <div class="col-md-6">
@@ -315,8 +426,308 @@
             const loadingSpinner = document.getElementById('loadingSpinner');
             const loadingMessage = document.getElementById('loadingMessage');
             const errorSection = document.getElementById('errorSection');
+            const voiceLanguage = document.getElementById('voiceLanguage');
+            const ttsLanguageKeyboard = document.getElementById('ttsLanguageKeyboard');
+            const ttsKeyboardNumberRow = document.getElementById('ttsKeyboardNumberRow');
+            const ttsKeyboardLanguageLabel = document.getElementById('ttsKeyboardLanguageLabel');
+            const ttsKeyAltMenu = document.getElementById('ttsKeyAltMenu');
+            const ttsKeyboardShift = document.getElementById('ttsKeyboardShift');
 
-            textToSpeak.addEventListener('input', function () { textCharCount.textContent = this.value.length; });
+            let isTtsShiftEnabled = false;
+            let ttsAltMenuOpen = false;
+            const ttsNumberSymbolKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', ',', '?', '!', '-', ':', ';', '(', ')', '"', '\'', '/', '@', '#'];
+            const ttsAlternateCharsMap = {
+                a: ['á', 'à', 'â', 'ä', 'ã'],
+                e: ['é', 'è', 'ê', 'ë'],
+                i: ['í', 'ì', 'î', 'ï'],
+                o: ['ó', 'ò', 'ô', 'ö', 'õ'],
+                u: ['ú', 'ù', 'û', 'ü'],
+                c: ['ç'],
+                n: ['ñ'],
+                y: ['ý'],
+                s: ['ß'],
+                d: ['ड', 'द'],
+                t: ['ट', 'त'],
+                k: ['क', 'ख'],
+                h: ['ह']
+            };
+            const latinFallbackKeys = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'á', 'é', 'í', 'ó', 'ú', 'à', 'è', 'ì', 'ò', 'ù', 'ä', 'ö', 'ü', 'ñ', 'ç'];
+            const ttsKeyboardLayoutMap = {
+                en: { label: 'English', keys: ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm'] },
+                es: { label: 'Spanish', keys: ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'ñ', 'z', 'x', 'c', 'v', 'b', 'n', 'á', 'é', 'í', 'ó', 'ú', 'ü'] },
+                fr: { label: 'French', keys: ['a', 'z', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'q', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'w', 'x', 'c', 'v', 'b', 'n', 'à', 'â', 'ç', 'é', 'è', 'ê', 'ë', 'î', 'ï', 'ô', 'ù', 'û', 'ü'] },
+                de: { label: 'German', keys: ['q', 'w', 'e', 'r', 't', 'z', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'y', 'x', 'c', 'v', 'b', 'n', 'm', 'ä', 'ö', 'ü', 'ß'] },
+                it: { label: 'Italian', keys: ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'à', 'è', 'é', 'ì', 'ò', 'ù'] },
+                pt: { label: 'Portuguese', keys: ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'ç', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'á', 'à', 'â', 'ã', 'é', 'ê', 'í', 'ó', 'ô', 'õ', 'ú'] },
+                nl: { label: 'Dutch', keys: latinFallbackKeys },
+                sv: { label: 'Swedish', keys: ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'å', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'ö', 'ä', 'z', 'x', 'c', 'v', 'b', 'n', 'm'] },
+                da: { label: 'Danish', keys: ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'å', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'æ', 'ø', 'z', 'x', 'c', 'v', 'b', 'n', 'm'] },
+                no: { label: 'Norwegian', keys: ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'å', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'ø', 'æ', 'z', 'x', 'c', 'v', 'b', 'n', 'm'] },
+                fi: { label: 'Finnish', keys: ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'å', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'ö', 'ä', 'z', 'x', 'c', 'v', 'b', 'n', 'm'] },
+                pl: { label: 'Polish', keys: ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'ą', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'ł', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'ć', 'ę', 'ń', 'ó', 'ś', 'ż', 'ź'] },
+                tr: { label: 'Turkish', keys: ['q', 'w', 'e', 'r', 't', 'y', 'u', 'ı', 'o', 'p', 'ğ', 'ü', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'ş', 'i', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'ö', 'ç'] },
+                cs: { label: 'Czech', keys: ['q', 'w', 'e', 'r', 't', 'z', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'y', 'x', 'c', 'v', 'b', 'n', 'm', 'á', 'č', 'ď', 'é', 'ě', 'í', 'ň', 'ó', 'ř', 'š', 'ť', 'ú', 'ů', 'ý', 'ž'] },
+                ru: { label: 'Russian', keys: ['й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ', 'ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю'] },
+                uk: { label: 'Ukrainian', keys: ['й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ї', 'ф', 'і', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'є', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю'] },
+                ja: { label: 'Japanese', keys: ['あ', 'い', 'う', 'え', 'お', 'か', 'き', 'く', 'け', 'こ', 'さ', 'し', 'す', 'せ', 'そ', 'た', 'ち', 'つ', 'て', 'と', 'な', 'に', 'ぬ', 'ね', 'の', 'は', 'ひ', 'ふ', 'へ', 'ほ', 'ま', 'み', 'む', 'め', 'も', 'や', 'ゆ', 'よ', 'ら', 'り', 'る', 'れ', 'ろ', 'わ', 'を', 'ん'] },
+                ko: { label: 'Korean', keys: ['ㅂ', 'ㅈ', 'ㄷ', 'ㄱ', 'ㅅ', 'ㅛ', 'ㅕ', 'ㅑ', 'ㅐ', 'ㅔ', 'ㅁ', 'ㄴ', 'ㅇ', 'ㄹ', 'ㅎ', 'ㅗ', 'ㅓ', 'ㅏ', 'ㅣ', 'ㅋ', 'ㅌ', 'ㅊ', 'ㅍ', 'ㅠ', 'ㅜ', 'ㅡ'] },
+                zh: { label: 'Chinese', keys: ['你', '好', '我', '是', '在', '的', '了', '人', '们', '中', '国', '文', '学', '生', '时', '间', '天', '地', '上', '下', '大', '小', '爱', '谢', '请', '再', '见'] },
+                ar: { label: 'Arabic', keys: ['ض', 'ص', 'ث', 'ق', 'ف', 'غ', 'ع', 'ه', 'خ', 'ح', 'ج', 'د', 'ش', 'س', 'ي', 'ب', 'ل', 'ا', 'ت', 'ن', 'م', 'ك', 'ط', 'ئ', 'ء', 'ؤ', 'ر', 'لا', 'ى', 'ة', 'و', 'ز', 'ظ'] },
+                hi: { label: 'Hindi', keys: ['अ', 'आ', 'इ', 'ई', 'उ', 'ऊ', 'ऋ', 'ए', 'ऐ', 'ओ', 'औ', 'क', 'ख', 'ग', 'घ', 'च', 'छ', 'ज', 'झ', 'ट', 'ठ', 'ड', 'ढ', 'त', 'थ', 'द', 'ध', 'न', 'प', 'फ', 'ब', 'भ', 'म', 'य', 'र', 'ल', 'व', 'श', 'ष', 'स', 'ह'] },
+                bn: { label: 'Bengali', keys: ['অ', 'আ', 'ই', 'ঈ', 'উ', 'ঊ', 'এ', 'ঐ', 'ও', 'ঔ', 'ক', 'খ', 'গ', 'ঘ', 'চ', 'ছ', 'জ', 'ঝ', 'ট', 'ঠ', 'ড', 'ঢ', 'ত', 'থ', 'দ', 'ধ', 'ন', 'প', 'ফ', 'ব', 'ভ', 'ম', 'য', 'র', 'ল', 'শ', 'ষ', 'স', 'হ'] },
+                ta: { label: 'Tamil', keys: ['அ', 'ஆ', 'இ', 'ஈ', 'உ', 'ஊ', 'எ', 'ஏ', 'ஐ', 'ஒ', 'ஓ', 'ஔ', 'க', 'ங', 'ச', 'ஜ', 'ஞ', 'ட', 'ண', 'த', 'ந', 'ப', 'ம', 'ய', 'ர', 'ல', 'வ', 'ழ', 'ள', 'ற', 'ன'] },
+                te: { label: 'Telugu', keys: ['అ', 'ఆ', 'ఇ', 'ఈ', 'ఉ', 'ఊ', 'ఋ', 'ఎ', 'ఏ', 'ఐ', 'ఒ', 'ఓ', 'ఔ', 'క', 'ఖ', 'గ', 'ఘ', 'చ', 'ఛ', 'జ', 'ఝ', 'ట', 'ఠ', 'డ', 'ఢ', 'త', 'థ', 'ద', 'ధ', 'న', 'ప', 'ఫ', 'బ', 'భ', 'మ', 'య', 'ర', 'ల', 'వ', 'శ', 'ష', 'స', 'హ'] },
+                ml: { label: 'Malayalam', keys: ['അ', 'ആ', 'ഇ', 'ഈ', 'ഉ', 'ഊ', 'ഋ', 'എ', 'ഏ', 'ഐ', 'ഒ', 'ഓ', 'ഔ', 'ക', 'ഖ', 'ഗ', 'ഘ', 'ച', 'ഛ', 'ജ', 'ഝ', 'ട', 'ഠ', 'ഡ', 'ഢ', 'ത', 'ഥ', 'ദ', 'ധ', 'ന', 'പ', 'ഫ', 'ബ', 'ഭ', 'മ', 'യ', 'ര', 'ല', 'വ', 'ശ', 'ഷ', 'സ', 'ഹ'] },
+                gu: { label: 'Gujarati', keys: ['અ', 'આ', 'ઇ', 'ઈ', 'ઉ', 'ઊ', 'ઋ', 'એ', 'ઐ', 'ઓ', 'ઔ', 'ક', 'ખ', 'ગ', 'ઘ', 'ચ', 'છ', 'જ', 'ઝ', 'ટ', 'ઠ', 'ડ', 'ઢ', 'ત', 'થ', 'દ', 'ધ', 'ન', 'પ', 'ફ', 'બ', 'ભ', 'મ', 'ય', 'ર', 'લ', 'વ', 'શ', 'ષ', 'સ', 'હ'] },
+                mr: { label: 'Marathi', keys: ['अ', 'आ', 'इ', 'ई', 'उ', 'ऊ', 'ए', 'ऐ', 'ओ', 'औ', 'क', 'ख', 'ग', 'घ', 'च', 'छ', 'ज', 'झ', 'ट', 'ठ', 'ड', 'ढ', 'त', 'थ', 'द', 'ध', 'न', 'प', 'फ', 'ब', 'भ', 'म', 'य', 'र', 'ल', 'व', 'श', 'ष', 'स', 'ह'] },
+                pa: { label: 'Punjabi', keys: ['ਅ', 'ਆ', 'ਇ', 'ਈ', 'ਉ', 'ਊ', 'ਏ', 'ਐ', 'ਓ', 'ਔ', 'ਕ', 'ਖ', 'ਗ', 'ਘ', 'ਚ', 'ਛ', 'ਜ', 'ਝ', 'ਟ', 'ਠ', 'ਡ', 'ਢ', 'ਤ', 'ਥ', 'ਦ', 'ਧ', 'ਨ', 'ਪ', 'ਫ', 'ਬ', 'ਭ', 'ਮ', 'ਯ', 'ਰ', 'ਲ', 'ਵ', 'ਸ਼', 'ਸ', 'ਹ'] }
+            };
+
+            function normalizeTtsKeyboardCode(languageCode) {
+                const raw = (languageCode || '').toLowerCase().trim();
+                if (!raw) return 'en';
+                if (raw.startsWith('zh')) return 'zh';
+                if (raw.startsWith('en')) return 'en';
+                if (raw.startsWith('es')) return 'es';
+                if (raw.startsWith('fr')) return 'fr';
+                if (raw.startsWith('pt')) return 'pt';
+                if (raw.startsWith('ar')) return 'ar';
+                if (raw.startsWith('hi')) return 'hi';
+                if (raw.startsWith('bn')) return 'bn';
+                if (raw.startsWith('ta')) return 'ta';
+                if (raw.startsWith('te')) return 'te';
+                if (raw.startsWith('ml')) return 'ml';
+                if (raw.startsWith('gu')) return 'gu';
+                if (raw.startsWith('mr')) return 'mr';
+                if (raw.startsWith('pa')) return 'pa';
+                return raw.split('-')[0];
+            }
+
+            function updateTextCharCount() {
+                textCharCount.textContent = textToSpeak.value.length;
+            }
+
+            function isLatinChar(charValue) {
+                return /^[a-z]$/i.test(charValue);
+            }
+
+            function transformTtsCharForShift(charValue) {
+                if (!isTtsShiftEnabled) {
+                    return charValue;
+                }
+                if (isLatinChar(charValue)) {
+                    return charValue.toUpperCase();
+                }
+                return charValue;
+            }
+
+            function updateTtsShiftButton() {
+                ttsKeyboardShift.textContent = isTtsShiftEnabled ? 'Shift On' : 'Shift Off';
+                ttsKeyboardShift.classList.toggle('btn-warning', isTtsShiftEnabled);
+                ttsKeyboardShift.classList.toggle('btn-outline-warning', !isTtsShiftEnabled);
+            }
+
+            function insertTtsTextAtCursor(textToInsert) {
+                const start = textToSpeak.selectionStart || 0;
+                const end = textToSpeak.selectionEnd || 0;
+                const current = textToSpeak.value;
+                textToSpeak.value = current.slice(0, start) + textToInsert + current.slice(end);
+                const nextPos = start + textToInsert.length;
+                textToSpeak.focus();
+                textToSpeak.setSelectionRange(nextPos, nextPos);
+                updateTextCharCount();
+            }
+
+            function backspaceTtsAtCursor() {
+                const start = textToSpeak.selectionStart || 0;
+                const end = textToSpeak.selectionEnd || 0;
+                if (start === end && start === 0) {
+                    return;
+                }
+
+                const current = textToSpeak.value;
+                if (start !== end) {
+                    textToSpeak.value = current.slice(0, start) + current.slice(end);
+                    textToSpeak.setSelectionRange(start, start);
+                } else {
+                    textToSpeak.value = current.slice(0, start - 1) + current.slice(end);
+                    textToSpeak.setSelectionRange(start - 1, start - 1);
+                }
+
+                textToSpeak.focus();
+                updateTextCharCount();
+            }
+
+            function closeTtsAltMenu() {
+                ttsKeyAltMenu.classList.remove('show');
+                ttsKeyAltMenu.innerHTML = '';
+                ttsAltMenuOpen = false;
+            }
+
+            function getTtsKeyboardConfig(languageCode) {
+                const normalizedCode = normalizeTtsKeyboardCode(languageCode);
+                if (ttsKeyboardLayoutMap[normalizedCode]) {
+                    return ttsKeyboardLayoutMap[normalizedCode];
+                }
+
+                const selectedText = voiceLanguage.selectedOptions[0]?.text || 'Language';
+                return { label: selectedText, keys: latinFallbackKeys };
+            }
+
+            function showTtsAltMenu(baseChar, buttonElement) {
+                const altChars = ttsAlternateCharsMap[(baseChar || '').toLowerCase()] || [];
+                if (!altChars.length) {
+                    return;
+                }
+
+                ttsKeyAltMenu.innerHTML = '';
+                altChars.forEach(altChar => {
+                    const altButton = document.createElement('button');
+                    altButton.type = 'button';
+                    altButton.className = 'key-alt-option';
+                    altButton.textContent = transformTtsCharForShift(altChar);
+                    altButton.addEventListener('click', () => {
+                        insertTtsTextAtCursor(transformTtsCharForShift(altChar));
+                        closeTtsAltMenu();
+                        if (isTtsShiftEnabled) {
+                            isTtsShiftEnabled = false;
+                            updateTtsShiftButton();
+                            renderTtsKeyboard(voiceLanguage.value);
+                        }
+                    });
+                    ttsKeyAltMenu.appendChild(altButton);
+                });
+
+                const buttonRect = buttonElement.getBoundingClientRect();
+                const wrapperRect = buttonElement.closest('.keyboard-wrapper').getBoundingClientRect();
+                ttsKeyAltMenu.style.left = `${buttonRect.left - wrapperRect.left}px`;
+                ttsKeyAltMenu.style.top = `${buttonRect.bottom - wrapperRect.top + 4}px`;
+                ttsKeyAltMenu.classList.add('show');
+                ttsAltMenuOpen = true;
+            }
+
+            function renderTtsNumberRow() {
+                ttsKeyboardNumberRow.innerHTML = '';
+                ttsNumberSymbolKeys.forEach(numberChar => {
+                    const keyButton = document.createElement('button');
+                    keyButton.type = 'button';
+                    keyButton.className = 'keyboard-key';
+                    keyButton.textContent = numberChar;
+                    keyButton.addEventListener('click', () => {
+                        closeTtsAltMenu();
+                        insertTtsTextAtCursor(numberChar);
+                    });
+                    ttsKeyboardNumberRow.appendChild(keyButton);
+                });
+            }
+
+            function renderTtsKeyboard(languageCode) {
+                const config = getTtsKeyboardConfig(languageCode);
+                ttsKeyboardLanguageLabel.textContent = config.label;
+                ttsLanguageKeyboard.innerHTML = '';
+                closeTtsAltMenu();
+
+                config.keys.forEach(keyChar => {
+                    const keyButton = document.createElement('button');
+                    keyButton.type = 'button';
+                    keyButton.className = 'keyboard-key';
+
+                    const displayChar = transformTtsCharForShift(keyChar);
+                    const altChars = ttsAlternateCharsMap[(keyChar || '').toLowerCase()] || [];
+                    if (altChars.length) {
+                        keyButton.classList.add('alt-available');
+                    }
+                    keyButton.textContent = displayChar;
+
+                    let holdTimer = null;
+                    let isLongPress = false;
+
+                    const startPress = (event) => {
+                        event.preventDefault();
+                        isLongPress = false;
+                        if (!altChars.length) {
+                            return;
+                        }
+                        holdTimer = setTimeout(() => {
+                            isLongPress = true;
+                            showTtsAltMenu(keyChar, keyButton);
+                        }, 420);
+                    };
+
+                    const endPress = () => {
+                        if (holdTimer) {
+                            clearTimeout(holdTimer);
+                            holdTimer = null;
+                        }
+                    };
+
+                    keyButton.addEventListener('mousedown', startPress);
+                    keyButton.addEventListener('touchstart', startPress, { passive: false });
+                    keyButton.addEventListener('mouseup', endPress);
+                    keyButton.addEventListener('mouseleave', endPress);
+                    keyButton.addEventListener('touchend', endPress);
+
+                    keyButton.addEventListener('click', () => {
+                        if (isLongPress) {
+                            isLongPress = false;
+                            return;
+                        }
+                        closeTtsAltMenu();
+                        insertTtsTextAtCursor(displayChar);
+                        if (isTtsShiftEnabled) {
+                            isTtsShiftEnabled = false;
+                            updateTtsShiftButton();
+                            renderTtsKeyboard(voiceLanguage.value);
+                        }
+                    });
+
+                    ttsLanguageKeyboard.appendChild(keyButton);
+                });
+            }
+
+            textToSpeak.addEventListener('input', function () { updateTextCharCount(); });
+
+            voiceLanguage.addEventListener('change', function () {
+                isTtsShiftEnabled = false;
+                updateTtsShiftButton();
+                renderTtsKeyboard(this.value);
+            });
+
+            ttsKeyboardShift.addEventListener('click', function () {
+                isTtsShiftEnabled = !isTtsShiftEnabled;
+                updateTtsShiftButton();
+                renderTtsKeyboard(voiceLanguage.value);
+            });
+
+            document.getElementById('ttsKeyboardSpace').addEventListener('click', function () {
+                closeTtsAltMenu();
+                insertTtsTextAtCursor(' ');
+            });
+
+            document.getElementById('ttsKeyboardBackspace').addEventListener('click', function () {
+                closeTtsAltMenu();
+                backspaceTtsAtCursor();
+            });
+
+            document.getElementById('ttsKeyboardClear').addEventListener('click', function () {
+                closeTtsAltMenu();
+                textToSpeak.value = '';
+                updateTextCharCount();
+                textToSpeak.focus();
+            });
+
+            document.addEventListener('click', function (event) {
+                if (!ttsAltMenuOpen) {
+                    return;
+                }
+                if (!event.target.closest('.keyboard-wrapper')) {
+                    closeTtsAltMenu();
+                }
+            });
+
+            renderTtsNumberRow();
+            updateTtsShiftButton();
+            renderTtsKeyboard(voiceLanguage.value);
 
             speechToTextForm.addEventListener('submit', async function (e) {
                 e.preventDefault();
@@ -407,7 +818,12 @@
                 document.getElementById('downloadAudio').onclick = function () { const a = document.createElement('a'); a.href = audioUrl; a.download = 'speech.mp3'; a.click(); };
                 document.getElementById('newTextToSpeech').onclick = function () {
                     document.getElementById('speechGenerationResults').style.display = 'none';
-                    textToSpeak.value = ''; textCharCount.textContent = '0'; textToSpeak.focus();
+                    textToSpeak.value = '';
+                    updateTextCharCount();
+                    isTtsShiftEnabled = false;
+                    updateTtsShiftButton();
+                    closeTtsAltMenu();
+                    textToSpeak.focus();
                     URL.revokeObjectURL(audioUrl);
                 };
             }

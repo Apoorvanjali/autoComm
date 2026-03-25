@@ -1,5 +1,5 @@
 """
-🚀 LoRA Fine-Tuning 
+ LoRA Fine-Tuning 
 ===========================
 
 Use Case: Fine-tune BART to summarize emails into action items

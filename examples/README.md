@@ -9,6 +9,7 @@ This folder contains **isolated examples and demos** that showcase advanced feat
 A **standalone demonstration** of how to fine-tune BART using LoRA (Low-Rank Adaptation) for domain-specific email summarization.
 
 #### What It Does
+
 - Creates a small dataset of emails → action items
 - Loads a pre-trained BART model
 - Applies LoRA adapters (only trains 0.1-1% of model parameters)
@@ -17,10 +18,11 @@ A **standalone demonstration** of how to fine-tune BART using LoRA (Low-Rank Ada
 - Saves the LoRA model separately
 
 #### Why This Matters for Your Review
+
 ✅ **Shows you understand fine-tuning** - Can tell reviewers "We have the capability to fine-tune"  
 ✅ **Demonstrates LoRA** - Efficient training method for memory/cost constraints  
 ✅ **Isolated implementation** - Doesn't touch your production code  
-✅ **Tangible demo** - You can actually run it and show output  
+✅ **Tangible demo** - You can actually run it and show output
 
 #### Quick Start
 
@@ -42,6 +44,7 @@ python examples/lora_finetuning_demo.py
 ```
 
 #### What Gets Generated
+
 ```
 lora-email-model/
 ├── adapter_config.json      (LoRA configuration - 1 KB)
@@ -52,25 +55,28 @@ lora-email-model/
 #### How to Explain It in Your Review
 
 **Simple Version:**
+
 > "We've implemented LoRA-based fine-tuning using the PEFT library. This allows us to train domain-specific models by only updating lightweight adapter layers instead of the entire BART model. It's 10-100x more efficient than traditional fine-tuning."
 
 **With Demo:**
+
 > "Let me show you — here's a demo where we fine-tuned BART on email summarization. You can see the model learns to extract action items instead of just copying text. This is exactly what we'd do for enterprise customers with proprietary data."
 
 **Technical Depth:**
+
 > "LoRA (Low-Rank Adaptation) decomposes weight updates into low-rank matrices. Instead of updating a 300M parameter model, we're only training ~0.1% of parameters through adapter layers. This makes fine-tuning feasible on standard hardware and reduces storage to just 5-10 MB per domain-specific model."
 
 ---
 
 ## 📊 Performance Metrics (For Discussion)
 
-| Metric | Full Fine-tune | LoRA Fine-tune |
-|--------|---|---|
-| **Parameters Trained** | 300M | 300K (0.1%) |
-| **Memory Required** | 16-24 GB GPU | 4-8 GB / even CPU |
-| **Training Time (6 samples)** | 5-10 minutes | 30 seconds |
-| **Model Size** | 1.2 GB | 10 MB |
-| **Training Cost** | $5-20 | $0.10-0.50 |
+| Metric                        | Full Fine-tune | LoRA Fine-tune    |
+| ----------------------------- | -------------- | ----------------- |
+| **Parameters Trained**        | 300M           | 300K (0.1%)       |
+| **Memory Required**           | 16-24 GB GPU   | 4-8 GB / even CPU |
+| **Training Time (6 samples)** | 5-10 minutes   | 30 seconds        |
+| **Model Size**                | 1.2 GB         | 10 MB             |
+| **Training Cost**             | $5-20          | $0.10-0.50        |
 
 ---
 
@@ -85,6 +91,7 @@ If you decide to integrate this into AutoComm:
 5. **Admin Panel** - Track which customers have fine-tuned models
 
 Example future code:
+
 ```python
 from peft import PeftModel
 
@@ -113,6 +120,7 @@ output = lora_model.generate(input_ids)
 ## 🎓 Learning Resources
 
 If you want to dive deeper:
+
 - [PEFT Documentation](https://huggingface.co/docs/peft/)
 - [LoRA Paper](https://arxiv.org/abs/2106.09685)
 - [Hugging Face Fine-tuning Guide](https://huggingface.co/docs/transformers/training)
