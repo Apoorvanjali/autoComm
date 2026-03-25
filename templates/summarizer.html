@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Text Summarizer - AutoComm</title>
+    <meta name="description"
+        content="Transform lengthy documents into concise summaries using advanced BART transformer models. Multiple length and style options.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Custom Premium CSS -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+
+    <style>
+        .split-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            min-height: calc(100vh - 200px);
+        }
+
+        @media (max-width: 992px) {
+            .split-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-panel,
+        .output-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .char-counter {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .char-counter.valid {
+            color: var(--success);
+        }
+
+        .example-text {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .example-text:hover {
+            background: var(--bg-hover);
+            transform: translateX(4px);
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-badge {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .progress-bar-custom {
+            height: 4px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--gradient-accent);
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Premium Navigation -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-bolt"></i>AutoComm
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/summarizer">Summarizer</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/translator">Translator</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/speech">Speech</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/email">Email</a>
+                    </li>
+                    {% if session.get('logged_in') %}
+                    <li class="nav-item ms-2">
+                        <a href="/logout" class="btn btn-outline-primary btn-sm" style="padding:0.5rem 1.125rem;">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item ms-2">
+                        <a class="nav-link" href="/login" style="font-weight:600;">Sign In</a>
+                    </li>
+                    <li class="nav-item ms-1">
+                        <a href="/signup" class="btn btn-primary btn-sm" style="padding:0.5rem 1.125rem;">
+                            <i class="fas fa-user-plus me-1"></i>Get Started
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="mb-4">
+                    <div class="hero-badge mb-3">
+                        <i class="fas fa-brain"></i>
+                        <span>Powered by BART Transformer Model</span>
+                    </div>
+                    <h1 class="display-4 fw-bold mb-3">
+                        AI Text <span class="text-gradient">Summarizer</span>
+                    </h1>
+                    <p class="lead" style="color: var(--text-secondary); max-width: 700px;">
+                        Transform lengthy documents into concise, meaningful summaries using advanced machine learning.
+                        Choose your preferred length and output style.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content - Split Layout -->
+    <div class="container mb-5">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="split-layout">
+                    <!-- Input Panel -->
+                    <div class="input-panel">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-edit me-2"></i>Input Text
+                                </h5>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <form id="summarizerForm" class="flex-grow-1 d-flex flex-column">
+                                    <!-- Text Input -->
+                                    <div class="mb-3 flex-grow-1 d-flex flex-column">
+                                        <label for="inputText" class="form-label">
+                                            <i class="fas fa-file-alt me-1"></i>
+                                            Enter or paste your text
+                                        </label>
+                                        <textarea id="inputText" class="form-control flex-grow-1" rows="12"
+                                            placeholder="Paste your article, document, or any lengthy text here. The AI will analyze and generate a concise summary based on your preferences..."
+                                            required minlength="100"></textarea>
+
+                                        <!-- Character Counter -->
+                                        <div class="d-flex justify-content-between align-items-center mt-2">
+                                            <div class="char-counter" id="charCounter">
+                                                <i class="fas fa-info-circle"></i>
+                                                <span id="charCount">0</span> characters (minimum 100)
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                onclick="clearInput()">
+                                                <i class="fas fa-times me-1"></i>Clear
+                                            </button>
+                                        </div>
+
+                                        <!-- Progress Bar -->
+                                        <div class="progress-bar-custom">
+                                            <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Options Row -->
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-6">
+                                            <label for="summaryLength" class="form-label">
+                                                <i class="fas fa-sliders-h me-1"></i>
+                                                Summary Length
+                                            </label>
+                                            <select id="summaryLength" class="form-select">
+                                                <option value="short">Short (30-80 words)</option>
+                                                <option value="medium" selected>Medium (80-150 words)</option>
+                                                <option value="long">Long (150-250 words)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="summaryStyle" class="form-label">
+                                                <i class="fas fa-palette me-1"></i>
+                                                Output Style
+                                            </label>
+                                            <select id="summaryStyle" class="form-select">
+                                                <option value="paragraph" selected>Paragraph</option>
+                                                <option value="bullet">Bullet Points</option>
+                                                <option value="abstract">Abstract</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Submit Button -->
+                                    <button type="submit" class="btn btn-primary btn-lg w-100" id="summarizeBtn">
+                                        <i class="fas fa-magic me-2"></i>
+                                        Generate Summary
+                                    </button>
+                                </form>
+
+                                <!-- Example Texts -->
+                                <div class="mt-4">
+                                    <p class="text-muted mb-2" style="font-size: 0.875rem;">
+                                        <i class="fas fa-lightbulb me-1"></i>Try an example:
+                                    </p>
+                                    <div class="example-text p-2 rounded" onclick="loadExample()">
+                                        <small style="color: var(--text-secondary);">
+                                            <i class="fas fa-file-alt me-1"></i>
+                                            Load sample AI article
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Output Panel -->
+                    <div class="output-panel">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-sparkles me-2"></i>Summary Result
+                                </h5>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <!-- Loading State -->
+                                <div id="loadingState" class="text-center py-5" style="display: none;">
+                                    <div class="spinner-border mb-3" style="color: var(--primary);" role="status">
+                                        <span class="visually-hidden">Processing...</span>
+                                    </div>
+                                    <h5 class="mb-2">AI is analyzing your text...</h5>
+                                    <p style="color: var(--text-secondary);">
+                                        Using BART transformer model for abstractive summarization
+                                    </p>
+                                </div>
+
+                                <!-- Empty State -->
+                                <div id="emptyState" class="text-center py-5">
+                                    <div class="mb-4">
+                                        <i class="fas fa-file-alt"
+                                            style="font-size: 4rem; color: var(--text-muted); opacity: 0.3;"></i>
+                                    </div>
+                                    <h5 class="mb-2">No summary yet</h5>
+                                    <p style="color: var(--text-secondary);">
+                                        Enter your text and click "Generate Summary" to get started
+                                    </p>
+                                </div>
+
+                                <!-- Results -->
+                                <div id="resultsSection" style="display: none;" class="flex-grow-1 d-flex flex-column">
+                                    <!-- Stats -->
+                                    <div class="summary-stats mb-4">
+                                        <div class="stat-badge">
+                                            <div class="text-muted"
+                                                style="font-size: 0.75rem; text-transform: uppercase;">Original</div>
+                                            <div class="fw-bold" id="originalLength">-</div>
+                                        </div>
+                                        <div class="stat-badge">
+                                            <div class="text-muted"
+                                                style="font-size: 0.75rem; text-transform: uppercase;">Summary</div>
+                                            <div class="fw-bold" id="summaryLength">-</div>
+                                        </div>
+                                        <div class="stat-badge">
+                                            <div class="text-muted"
+                                                style="font-size: 0.75rem; text-transform: uppercase;">Reduction</div>
+                                            <div class="fw-bold text-success" id="reductionPercent">-</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Summary Text -->
+                                    <div class="summary-result flex-grow-1 mb-3" id="summaryText">
+                                        <!-- Summary will be inserted here -->
+                                    </div>
+
+                                    <!-- Action Buttons -->
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-outline-primary flex-grow-1" onclick="copySummary()">
+                                            <i class="fas fa-copy me-2"></i>Copy
+                                        </button>
+                                        <button class="btn btn-outline-secondary flex-grow-1"
+                                            onclick="downloadSummary()">
+                                            <i class="fas fa-download me-2"></i>Download
+                                        </button>
+                                        <button class="btn btn-outline-secondary" onclick="resetForm()">
+                                            <i class="fas fa-redo me-2"></i>New
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    <script>
+        // Character counter
+        const inputText = document.getElementById('inputText');
+        const charCount = document.getElementById('charCount');
+        const charCounter = document.getElementById('charCounter');
+        const progressBar = document.getElementById('progressBar');
+
+        inputText.addEventListener('input', function () {
+            const count = this.value.length;
+            charCount.textContent = count;
+
+            if (count >= 100) {
+                charCounter.classList.add('valid');
+            } else {
+                charCounter.classList.remove('valid');
+            }
+
+            // Update progress bar
+            const progress = Math.min((count / 100) * 100, 100);
+            progressBar.style.width = progress + '%';
+        });
+
+        // Form submission
+        document.getElementById('summarizerForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const text = document.getElementById('inputText').value.trim();
+            const summaryLength = document.getElementById('summaryLength').value;
+            const summaryStyle = document.getElementById('summaryStyle').value;
+
+            if (text.length < 100) {
+                alert('Please enter at least 100 characters.');
+                return;
+            }
+
+            // Show loading state
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('summarizeBtn').disabled = true;
+
+            try {
+                const response = await fetch('/api/summarize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        summary_length: summaryLength,
+                        summary_style: summaryStyle
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Show results
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('resultsSection').style.display = 'flex';
+
+                    // Update stats
+                    document.getElementById('originalLength').textContent = data.original_length + ' chars';
+                    document.getElementById('summaryLength').textContent = data.summary_length + ' chars';
+                    const reduction = Math.round((1 - data.summary_length / data.original_length) * 100);
+                    document.getElementById('reductionPercent').textContent = reduction + '%';
+
+                    // Update summary text
+                    document.getElementById('summaryText').textContent = data.summary;
+                } else {
+                    throw new Error(data.error || 'Summarization failed');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'block';
+            } finally {
+                document.getElementById('summarizeBtn').disabled = false;
+            }
+        });
+
+        // Helper functions
+        function clearInput() {
+            document.getElementById('inputText').value = '';
+            charCount.textContent = '0';
+            charCounter.classList.remove('valid');
+            progressBar.style.width = '0%';
+        }
+
+        function resetForm() {
+            clearInput();
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'block';
+        }
+
+        function copySummary() {
+            const summaryText = document.getElementById('summaryText').textContent;
+            navigator.clipboard.writeText(summaryText).then(() => {
+                alert('Summary copied to clipboard!');
+            });
+        }
+
+        function downloadSummary() {
+            const summaryText = document.getElementById('summaryText').textContent;
+            const blob = new Blob([summaryText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'summary.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function loadExample() {
+            const exampleText = "Artificial intelligence has revolutionized the way we interact with technology. Machine learning algorithms can now process vast amounts of data and identify patterns that humans might miss. Deep learning, a subset of machine learning, uses neural networks with multiple layers to analyze complex data structures. These technologies are being applied in various fields including healthcare, finance, and autonomous vehicles. Natural language processing enables computers to understand and generate human language, making chatbots and virtual assistants more sophisticated. Computer vision allows machines to interpret and understand visual information from the world. As AI continues to advance, ethical considerations become increasingly important, including issues of privacy, bias, and job displacement. The future of AI promises even more transformative changes across all sectors of society.";
+            document.getElementById('inputText').value = exampleText;
+            inputText.dispatchEvent(new Event('input'));
+        }
+    </script>
+</body>
+
+</html>

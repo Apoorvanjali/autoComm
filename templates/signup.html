@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - AutoComm</title>
+    <meta name="description" content="Create your free AutoComm account and access AI-powered text processing, translation, and automation tools.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <style>
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-page::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--gradient-mesh);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .auth-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .auth-split {
+            display: flex;
+            width: 100%;
+            max-width: 1020px;
+            border-radius: var(--radius-2xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-2xl);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Left brand panel */
+        .auth-brand-panel {
+            flex: 1;
+            background: var(--gradient-accent);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 3rem 2.5rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-brand-panel::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 280px; height: 280px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .auth-brand-panel::after {
+            content: '';
+            position: absolute;
+            bottom: -80px; left: -40px;
+            width: 320px; height: 320px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+        }
+
+        .auth-brand-panel .brand-logo {
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+        }
+
+        .auth-brand-panel .brand-tagline {
+            font-size: 1.65rem;
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.25rem;
+        }
+
+        .auth-brand-panel .brand-sub {
+            font-size: 1rem;
+            opacity: 0.88;
+            line-height: 1.65;
+            margin-bottom: 2.5rem;
+        }
+
+        .auth-brand-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.875rem;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            opacity: 0.95;
+        }
+
+        .auth-brand-feature .feat-icon {
+            width: 32px; height: 32px;
+            background: rgba(255,255,255,0.18);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.875rem;
+        }
+
+        /* Right form panel */
+        .auth-form-panel {
+            flex: 1.15;
+            background: var(--bg-card);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 3rem 2.5rem;
+        }
+
+        .auth-form-title {
+            font-size: 1.875rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .auth-form-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.25rem 0;
+        }
+
+        .auth-divider span {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .btn-social {
+            background: var(--bg-secondary);
+            border: 1.5px solid var(--border-color);
+            color: var(--text-primary);
+            font-weight: 500;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.625rem;
+            transition: all var(--transition-base);
+            cursor: pointer;
+            font-size: 0.9375rem;
+            margin-bottom: 0.625rem;
+        }
+
+        .btn-social:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            transform: translateY(-1px);
+        }
+
+        .btn-social .social-icon {
+            width: 20px; height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+        }
+
+        .input-group-icon {
+            position: relative;
+        }
+
+        .input-group-icon .form-control {
+            padding-left: 3rem;
+        }
+
+        .input-group-icon .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            z-index: 10;
+            font-size: 0.9375rem;
+            transition: color var(--transition-fast);
+        }
+
+        .input-group-icon:focus-within .input-icon {
+            color: var(--primary);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            z-index: 10;
+            padding: 0;
+            transition: color var(--transition-fast);
+            display: flex;
+            align-items: center;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary);
+        }
+
+        .auth-footer-link {
+            text-align: center;
+            margin-top: 1.25rem;
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+        }
+
+        .auth-footer-link a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all var(--transition-fast);
+        }
+
+        .auth-footer-link a:hover {
+            text-decoration: underline;
+            color: var(--primary-hover);
+        }
+
+        /* Password strength bar */
+        .password-strength-bar {
+            height: 4px;
+            border-radius: var(--radius-full);
+            background: var(--border-color);
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .password-strength-fill {
+            height: 100%;
+            border-radius: var(--radius-full);
+            transition: width 0.3s ease, background 0.3s ease;
+            width: 0%;
+        }
+
+        .strength-label {
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            font-weight: 500;
+        }
+
+        .alert-auth {
+            border-radius: var(--radius-lg);
+            border: none;
+            font-size: 0.9rem;
+            padding: 0.875rem 1rem;
+        }
+
+        @media (max-width: 767px) {
+            .auth-brand-panel { display: none; }
+            .auth-split {
+                max-width: 480px;
+                border-radius: var(--radius-xl);
+            }
+            .auth-form-panel {
+                padding: 2.5rem 1.75rem;
+            }
+        }
+
+        .alert {
+            animation: fadeInDown 0.35s ease;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-auth-primary {
+            background: var(--gradient-accent);
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 0.9rem 1.5rem;
+            border: none;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            box-shadow: 0 4px 14px 0 var(--primary-glow);
+            letter-spacing: -0.01em;
+        }
+
+        .btn-auth-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px 0 var(--primary-glow);
+        }
+
+        .btn-auth-primary:active {
+            transform: scale(0.98);
+        }
+
+        .terms-text {
+            font-size: 0.83rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 1rem;
+            line-height: 1.5;
+        }
+
+        .terms-text a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .terms-text a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Minimal Navbar -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-bolt"></i>AutoComm
+            </a>
+            <div class="ms-auto">
+                <a href="/login" class="btn btn-outline-primary btn-sm" id="nav-login-btn">
+                    <i class="fas fa-sign-in-alt me-1"></i>Sign In
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="auth-page">
+        <div class="auth-wrapper">
+            <div class="auth-split">
+                <!-- Brand Panel -->
+                <div class="auth-brand-panel">
+                    <div class="brand-logo">
+                        <i class="fas fa-bolt"></i> AutoComm
+                    </div>
+                    <div class="brand-tagline">Your AI toolkit starts here</div>
+                    <p class="brand-sub">Join thousands of professionals using AutoComm to save hours every week with intelligent automation.</p>
+                    <div class="auth-brand-feature">
+                        <div class="feat-icon"><i class="fas fa-rocket"></i></div>
+                        <span>Get started in seconds — free forever</span>
+                    </div>
+                    <div class="auth-brand-feature">
+                        <div class="feat-icon"><i class="fas fa-shield-alt"></i></div>
+                        <span>Enterprise-grade security</span>
+                    </div>
+                    <div class="auth-brand-feature">
+                        <div class="feat-icon"><i class="fas fa-bolt"></i></div>
+                        <span>Lightning-fast AI processing</span>
+                    </div>
+                    <div class="auth-brand-feature">
+                        <div class="feat-icon"><i class="fas fa-globe"></i></div>
+                        <span>12+ languages supported</span>
+                    </div>
+                </div>
+
+                <!-- Form Panel -->
+                <div class="auth-form-panel">
+                    <h1 class="auth-form-title">Create an account</h1>
+                    <p class="auth-form-subtitle">It's free — no credit card needed</p>
+
+                    <!-- Flash Messages -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-auth alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-{{ 'exclamation-circle' if category == 'error' else 'check-circle' }} me-2"></i>
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- Social Sign-up -->
+                    <button class="btn-social" type="button" id="google-signup-btn" onclick="showSocialNotice()">
+                        <span class="social-icon" style="color:#EA4335;"><i class="fab fa-google"></i></span>
+                        Continue with Google
+                    </button>
+                    <button class="btn-social" type="button" id="github-signup-btn" onclick="showSocialNotice()">
+                        <span class="social-icon"><i class="fab fa-github"></i></span>
+                        Continue with GitHub
+                    </button>
+
+                    <div class="auth-divider">
+                        <span>or sign up with email</span>
+                    </div>
+
+                    <!-- Signup Form -->
+                    <form id="signupForm" action="/signup" method="POST" novalidate>
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label for="signup-firstname" class="form-label">First name</label>
+                                <div class="input-group-icon">
+                                    <input type="text" class="form-control" id="signup-firstname" name="first_name"
+                                        placeholder="Ada" required autocomplete="given-name">
+                                    <i class="fas fa-user input-icon"></i>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <label for="signup-lastname" class="form-label">Last name</label>
+                                <div class="input-group-icon">
+                                    <input type="text" class="form-control" id="signup-lastname" name="last_name"
+                                        placeholder="Lovelace" autocomplete="family-name">
+                                    <i class="fas fa-user input-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="signup-email" class="form-label">Email address</label>
+                            <div class="input-group-icon">
+                                <input type="email" class="form-control" id="signup-email" name="email"
+                                    placeholder="you@example.com" required autocomplete="email">
+                                <i class="fas fa-envelope input-icon"></i>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="signup-password" class="form-label">Password</label>
+                            <div class="input-group-icon" style="position:relative;">
+                                <input type="password" class="form-control" id="signup-password" name="password"
+                                    placeholder="At least 8 characters" required autocomplete="new-password"
+                                    style="padding-right:3rem;">
+                                <i class="fas fa-lock input-icon"></i>
+                                <button type="button" class="password-toggle" id="toggle-signup-password"
+                                    aria-label="Toggle password visibility">
+                                    <i class="fas fa-eye" id="toggle-signup-icon"></i>
+                                </button>
+                            </div>
+                            <!-- Strength indicator -->
+                            <div class="password-strength-bar mt-2">
+                                <div class="password-strength-fill" id="strength-fill"></div>
+                            </div>
+                            <div class="strength-label" id="strength-label" style="color: var(--text-muted);"></div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="signup-confirm-password" class="form-label">Confirm password</label>
+                            <div class="input-group-icon" style="position:relative;">
+                                <input type="password" class="form-control" id="signup-confirm-password"
+                                    name="confirm_password" placeholder="Repeat your password" required
+                                    autocomplete="new-password" style="padding-right:3rem;">
+                                <i class="fas fa-lock input-icon"></i>
+                                <button type="button" class="password-toggle" id="toggle-confirm-password"
+                                    aria-label="Toggle confirm password visibility">
+                                    <i class="fas fa-eye" id="toggle-confirm-icon"></i>
+                                </button>
+                            </div>
+                            <div id="password-match-msg" style="font-size:0.8rem;margin-top:0.3rem;"></div>
+                        </div>
+
+                        <button type="submit" class="btn-auth-primary" id="signup-submit-btn">
+                            <i class="fas fa-user-plus me-2"></i>Create Free Account
+                        </button>
+
+                        <p class="terms-text">
+                            By creating an account you agree to our
+                            <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+                        </p>
+                    </form>
+
+                    <div class="auth-footer-link">
+                        Already have an account? <a href="/login" id="goto-login-link">Sign in here</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // --- Password toggle (signup) ---
+        function makeToggle(btnId, inputId, iconId) {
+            document.getElementById(btnId).addEventListener('click', function () {
+                const inp = document.getElementById(inputId);
+                const icon = document.getElementById(iconId);
+                const show = inp.type === 'password';
+                inp.type = show ? 'text' : 'password';
+                icon.className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
+            });
+        }
+        makeToggle('toggle-signup-password', 'signup-password', 'toggle-signup-icon');
+        makeToggle('toggle-confirm-password', 'signup-confirm-password', 'toggle-confirm-icon');
+
+        // --- Password strength ---
+        const passwordInput = document.getElementById('signup-password');
+        const strengthFill = document.getElementById('strength-fill');
+        const strengthLabel = document.getElementById('strength-label');
+
+        passwordInput.addEventListener('input', function () {
+            const val = this.value;
+            let score = 0;
+            if (val.length >= 8) score++;
+            if (val.length >= 12) score++;
+            if (/[A-Z]/.test(val)) score++;
+            if (/[0-9]/.test(val)) score++;
+            if (/[^A-Za-z0-9]/.test(val)) score++;
+
+            const levels = [
+                { label: '', color: '', pct: '0%' },
+                { label: 'Weak', color: '#ef4444', pct: '20%' },
+                { label: 'Fair', color: '#f59e0b', pct: '40%' },
+                { label: 'Good', color: '#3b82f6', pct: '65%' },
+                { label: 'Strong', color: '#10b981', pct: '85%' },
+                { label: 'Very Strong', color: '#059669', pct: '100%' },
+            ];
+
+            const level = val.length === 0 ? levels[0] : levels[Math.min(score, 5)];
+            strengthFill.style.width = level.pct;
+            strengthFill.style.background = level.color;
+            strengthLabel.textContent = level.label;
+            strengthLabel.style.color = level.color;
+        });
+
+        // --- Password match check ---
+        const confirmInput = document.getElementById('signup-confirm-password');
+        const matchMsg = document.getElementById('password-match-msg');
+
+        function checkMatch() {
+            if (!confirmInput.value) { matchMsg.textContent = ''; return; }
+            if (passwordInput.value === confirmInput.value) {
+                matchMsg.textContent = '✓ Passwords match';
+                matchMsg.style.color = 'var(--success)';
+            } else {
+                matchMsg.textContent = '✗ Passwords do not match';
+                matchMsg.style.color = 'var(--danger)';
+            }
+        }
+
+        confirmInput.addEventListener('input', checkMatch);
+        passwordInput.addEventListener('input', checkMatch);
+
+        // --- Form submission ---
+        document.getElementById('signupForm').addEventListener('submit', function (e) {
+            const firstName = document.getElementById('signup-firstname').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = passwordInput.value;
+            const confirm = confirmInput.value;
+
+            if (!firstName || !email || !password || !confirm) {
+                e.preventDefault();
+                showInlineError('Please fill in all required fields.');
+                return;
+            }
+
+            if (password !== confirm) {
+                e.preventDefault();
+                showInlineError('Passwords do not match. Please try again.');
+                return;
+            }
+
+            if (password.length < 8) {
+                e.preventDefault();
+                showInlineError('Password must be at least 8 characters long.');
+                return;
+            }
+
+            const btn = document.getElementById('signup-submit-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin me-2"></i>Creating account...';
+        });
+
+        // Social sign-up notice
+        function showSocialNotice() {
+            const existing = document.getElementById('social-notice');
+            if (existing) { existing.remove(); }
+            const alert = document.createElement('div');
+            alert.id = 'social-notice';
+            alert.className = 'alert alert-info alert-auth alert-dismissible fade show';
+            alert.innerHTML = '<i class="fas fa-info-circle me-2"></i>Social sign-up coming soon! Please use email for now. <button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+            document.querySelector('.auth-form-panel').insertBefore(alert, document.querySelector('.auth-divider'));
+        }
+
+        // Inline error
+        function showInlineError(msg) {
+            const existing = document.getElementById('inline-error');
+            if (existing) existing.remove();
+            const el = document.createElement('div');
+            el.id = 'inline-error';
+            el.className = 'alert alert-danger alert-auth alert-dismissible fade show';
+            el.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>${msg}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+            document.getElementById('signupForm').prepend(el);
+        }
+    </script>
+</body>
+</html>
