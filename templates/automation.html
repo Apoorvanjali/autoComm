@@ -106,8 +106,15 @@
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Target Language</label>
-                                <select class="form-select" name="target_language" required>
+                                <div class="form-check mt-4">
+                                    <input class="form-check-input" type="checkbox" id="runTranslate" name="run_translate" value="true" checked>
+                                    <label class="form-check-label" for="runTranslate">Run translation step</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" id="targetLanguageWrap">
+                                <label class="form-label">Translate To Language</label>
+                                <select class="form-select" id="targetLanguageSelect" name="target_language">
                                     {% for code, name in language_options %}
                                     <option value="{{ code }}" {% if code == 'en' %}selected{% endif %}>
                                         {{ name }} ({{ code }})
@@ -203,6 +210,9 @@
         const stepsContainer = document.getElementById('stepsContainer');
         const resultBox = document.getElementById('resultBox');
         const runBtn = document.getElementById('runBtn');
+        const runTranslate = document.getElementById('runTranslate');
+        const targetLanguageWrap = document.getElementById('targetLanguageWrap');
+        const targetLanguageSelect = document.getElementById('targetLanguageSelect');
 
         function toggleMode() {
             const mode = inputMode.value;
@@ -213,6 +223,15 @@
         inputMode.addEventListener('change', toggleMode);
         toggleMode();
 
+        function toggleTranslateOptions() {
+            const enabled = runTranslate.checked;
+            targetLanguageWrap.style.display = enabled ? '' : 'none';
+            targetLanguageSelect.required = enabled;
+        }
+
+        runTranslate.addEventListener('change', toggleTranslateOptions);
+        toggleTranslateOptions();
+
         workflowForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             runBtn.disabled = true;
@@ -220,6 +239,9 @@
 
             try {
                 const formData = new FormData(workflowForm);
+                if (!runTranslate.checked) {
+                    formData.delete('target_language');
+                }
                 const response = await fetch('/api/automation-workflow', {
                     method: 'POST',
                     body: formData

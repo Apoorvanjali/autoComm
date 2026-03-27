@@ -515,6 +515,7 @@ def api_automation_workflow():
         summary_length = request.form.get('summary_length', 'medium').strip()
         summary_style = request.form.get('summary_style', 'paragraph').strip()
         target_language = request.form.get('target_language', 'en').strip()
+        run_translate = request.form.get('run_translate', 'true').strip().lower() in ('1', 'true', 'yes', 'on')
 
         run_plagiarism = request.form.get('run_plagiarism', 'false').strip().lower() in ('1', 'true', 'yes', 'on')
         plagiarism_mode = request.form.get('plagiarism_mode', 'advanced').strip()
@@ -548,6 +549,7 @@ def api_automation_workflow():
             summary_length=summary_length,
             summary_style=summary_style,
             target_language=target_language,
+            run_translate=run_translate,
             sender_email=sender_email,
             sender_password=sender_password,
             receiver_email=receiver_email,

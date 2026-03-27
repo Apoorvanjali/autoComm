@@ -23,6 +23,7 @@ class WorkflowAutomationService:
         summary_length: str = "medium",
         summary_style: str = "paragraph",
         target_language: str = "en",
+        run_translate: bool = True,
         sender_email: Optional[str] = None,
         sender_password: Optional[str] = None,
         receiver_email: Optional[str] = None,
@@ -79,10 +80,16 @@ class WorkflowAutomationService:
             result["outputs"]["summary"] = summary
 
             # 4) Translate
-            target_lang_code = self._get_iso_lang_code(target_language)
-            translated_text = self.translator.translate(summary, source_lang="auto", target_lang=target_lang_code)
-            result["steps"]["translate"] = {"status": "done", "target_language": target_language}
-            result["outputs"]["translated_text"] = translated_text
+            if run_translate:
+                target_lang_code = self._get_iso_lang_code(target_language)
+                translated_text = self.translator.translate(summary, source_lang="auto", target_lang=target_lang_code)
+                result["steps"]["translate"] = {"status": "done", "target_language": target_language}
+                result["outputs"]["translated_text"] = translated_text
+            else:
+                translated_text = summary
+                result["steps"]["translate"] = {"status": "skipped"}
+                result["outputs"]["translated_text"] = summary
+                target_language = "en"
 
             # 5) Convert translated text to speech
             audio_file_path = self.text_to_speech.convert_text_to_speech(
@@ -97,7 +104,14 @@ class WorkflowAutomationService:
 
             # 6) Send mail with generated audio attachment
             self._validate_email_fields(sender_email, sender_password, receiver_email)
-            mail_body = self._build_email_body(text, summary, translated_text, target_language, result["outputs"].get("plagiarism_report"))
+            mail_body = self._build_email_body(
+                text,
+                summary,
+                translated_text,
+                target_language,
+                result["outputs"].get("plagiarism_report"),
+                translated=run_translate,
+            )
             sent = self.email_service.send_email(
                 sender_email=sender_email,
                 sender_password=sender_password,
@@ -152,7 +166,7 @@ class WorkflowAutomationService:
         if not sender_email or not sender_password or not receiver_email:
             raise ValueError("sender_email, sender_password, and receiver_email are required")
 
-    def _build_email_body(self, original_text, summary, translated_text, target_language, plagiarism_report=None):
+    def _build_email_body(self, original_text, summary, translated_text, target_language, plagiarism_report=None, translated=True):
         body_parts = [
             "Hello,",
             "",
@@ -161,10 +175,20 @@ class WorkflowAutomationService:
             "=== Summary ===",
             summary,
             "",
-            f"=== Translated Summary ({target_language}) ===",
-            translated_text,
-            "",
         ]
+
+        if translated:
+            body_parts.extend([
+                f"=== Translated Summary ({target_language}) ===",
+                translated_text,
+                "",
+            ])
+        else:
+            body_parts.extend([
+                "=== Translation Step ===",
+                "Skipped",
+                "",
+            ])
 
         if plagiarism_report and plagiarism_report.get("success"):
             body_parts.extend([
