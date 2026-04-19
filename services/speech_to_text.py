@@ -135,7 +135,7 @@ class SpeechToTextConverter:
             ext = os.path.splitext(file_lower)[1].lstrip('.')
             format_map = {
                 'mp3': 'mp3', 'ogg': 'ogg', 'flac': 'flac',
-                'aac': 'aac', 'm4a': 'mp4', 'webm': 'webm',
+                'aac': 'aac', 'm4a': 'mp4', 'mp4': 'mp4', 'webm': 'webm',
                 'wma': 'asf', 'aiff': 'aiff', 'opus': 'opus',
             }
             fmt = format_map.get(ext, ext) or 'mp3'
@@ -154,7 +154,7 @@ class SpeechToTextConverter:
         except Exception as e:
             raise RuntimeError(
                 f"Audio conversion failed: {e}. "
-                "For MP3/M4A/WEBM input, install ffmpeg and ensure it is on PATH."
+                "For MP3/M4A/MP4/WEBM input, install ffmpeg and ensure it is on PATH."
             )
 
     def _recognize_with_fallback(self, audio_data, language):

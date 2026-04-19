@@ -134,3 +134,43 @@ When asked "Can you fine-tune models?":
 > "Yes. Here's a working example. We use LoRA for efficiency. It trains 0.1% of parameters, costs ~90% less than full fine-tuning, and works on standard hardware. We're ready to offer this as a premium feature for enterprise customers with their own datasets."
 
 **Then run the demo and show them the output.** That's infinitely more credible than just talking about it. 💪
+
+---
+
+### 2. **lora_demos/** (Multi-Task Isolated LoRA Suite)
+
+This is a side-demo suite for multiple task categories relevant to AutoComm, kept fully isolated from production code.
+
+Included scripts:
+
+- `examples/lora_demos/run_summarization_lora.py`
+  - Model: `google/flan-t5-small`
+  - Dataset: `xsum`
+  - Metric: ROUGE
+
+- `examples/lora_demos/run_translation_lora.py`
+  - Model: `Helsinki-NLP/opus-mt-en-fr`
+  - Dataset: `opus_books (en-fr)`
+  - Metric: SacreBLEU
+
+- `examples/lora_demos/run_speech_lora.py`
+  - Model: `facebook/wav2vec2-base-960h`
+  - Dataset: `librispeech_asr (clean)`
+  - Metric: WER
+
+Quick run:
+
+```bash
+pip install -r requirements-lora.txt
+python examples/lora_demos/run_summarization_lora.py
+python examples/lora_demos/run_translation_lora.py
+python examples/lora_demos/run_speech_lora.py
+```
+
+Every script saves:
+
+- LoRA adapter weights
+- tokenizer/processor artifacts
+- `report.json` with task metrics and trainable parameter stats
+
+See full details in `examples/lora_demos/README.md`.

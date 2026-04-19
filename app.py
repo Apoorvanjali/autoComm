@@ -357,6 +357,42 @@ def api_speech_to_text():
             except Exception:
                 pass
 
+@app.route('/api/microphone-to-text', methods=['POST'])
+def api_microphone_to_text():
+    """
+    API endpoint for live microphone transcription.
+    Accepts:
+      - language (str): BCP-47 code for recognition, e.g. 'en-US' (default)
+      - timeout (int): Recording timeout in seconds (default 10)
+    """
+    try:
+        data = request.get_json() or {}
+        language = data.get('language', 'en-US')
+        timeout = int(data.get('timeout', 10))
+        
+        if timeout < 1 or timeout > 60:
+            return jsonify({'error': 'Timeout must be between 1 and 60 seconds'}), 400
+        
+        # Record from microphone
+        text = speech_to_text.convert_microphone_to_text(language=language, timeout=timeout)
+        
+        if not text or 'error' in text.lower() or 'not available' in text.lower():
+            return jsonify({
+                'success': False,
+                'error': text or 'Failed to transcribe microphone input'
+            }), 503
+        
+        return jsonify({
+            'success': True,
+            'text': text,
+            'language': language,
+        })
+        
+    except RuntimeError as e:
+        return jsonify({'error': str(e)}), 503
+    except Exception as e:
+        return jsonify({'error': f'Microphone transcription failed: {str(e)}'}), 500
+
 @app.route('/api/text-to-speech', methods=['POST'])
 def api_text_to_speech():
     """
